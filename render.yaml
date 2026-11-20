@@ -1,0 +1,35 @@
+# Сайт БХ на Render.com (Blueprint): Dashboard → New → Blueprint → обрати репозиторій bh → Apply.
+#
+# Тариф Starter (~7 $/міс) + диск 1 ГБ: сайт працює 24/7, заявки, фото й зміни каталогу зберігаються.
+# На безкоштовному тарифі (без диска) сайт «засинає» і втрачає нові заявки при перезапуску — лише для демонстрації.
+services:
+  - type: web
+    name: bh
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: "echo 'no build step'"
+    startCommand: npm start
+    healthCheckPath: /api/meta
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22.22.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: ADMIN_PASSWORD        # пароль адмінки /admin
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN    # сповіщення про заявки (див. README)
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      # Додаються вручну в Environment за потреби:
+      # PUBLIC_URL=https://ваш-домен                 — адреса для Google і соцмереж
+      # GOOGLE_SITE_VERIFICATION=код                 — підтвердження в Google Search Console
+      # RESEND_API_KEY + NOTIFY_EMAIL (+ EMAIL_FROM) — копія заявок на пошту

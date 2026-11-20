@@ -1,0 +1,82 @@
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const { db, UPLOAD_DIR, parseJSON } = require('./db');
+
+const ITEM_FIELDS = ['slug', 'kind', 'category', 'title', 'title_ru', 'title_en', 'summary', 'summary_ru', 'summary_en',
+  'description', 'description_ru', 'description_en', 'specs', 'highlights', 'price', 'price_type', 'price_note', 'unit',
+  'availability', 'lead_time', 'rent', 'custom', 'plastic_kg', 'images', 'featured', 'published', 'sort', 'source_url'];
+
+function insertItem(it) {
+  const row = {
+    title_ru: '', title_en: '', summary: '', summary_ru: '', summary_en: '', description: '', description_ru: '', description_en: '',
+    specs: [], highlights: [], price: null, price_type: 'fixed', price_note: '', unit: 'шт.', availability: 'order', lead_time: '',
+    rent: 0, custom: 1, plastic_kg: null, images: [], featured: 0, published: 1, sort: 100, source_url: '', ...it,
+  };
+  row.specs = JSON.stringify(row.specs);
+  row.highlights = JSON.stringify(row.highlights);
+  row.images = JSON.stringify(row.images);
+  const cols = ITEM_FIELDS.join(', ');
+  const qs = ITEM_FIELDS.map(() => '?').join(', ');
+  return db.prepare(`INSERT INTO items (${cols}) VALUES (${qs})`).run(...ITEM_FIELDS.map((f) => row[f] ?? null));
+}
+
+function seedIfEmpty() {
+  if (process.env.SEED === '0') return;
+  if (!db.prepare('SELECT COUNT(*) n FROM items').get().n) {
+    const items = require('../seed/items');
+    for (const it of items) insertItem(it);
+    console.log(`Каталог: завантажено ${items.length} позицій (обладнання, вироби, послуги).`);
+  }
+  if (!db.prepare('SELECT COUNT(*) n FROM vacancies').get().n && !db.prepare("SELECT 1 FROM settings WHERE key = 'vacancies_seeded'").get()) {
+    const ins = db.prepare('INSERT INTO vacancies (title, kind, schedule, salary, summary, duties, requirements, offer, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    for (const v of require('../seed/vacancies')) {
+      ins.run(v.title, v.kind, v.schedule, v.salary, v.summary, JSON.stringify(v.duties), JSON.stringify(v.requirements), JSON.stringify(v.offer), v.sort);
+    }
+    db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('vacancies_seeded', '\"1\"')").run();
+  }
+}
+
+// Фото з Prom завантажуємо на свій диск у фоні: сайт не залежить від чужого сервера.
+// Якщо завантажити не вдалося — лишається посилання на оригінал, спробуємо при наступному запуску.
+async function cacheRemoteImages({ log = console.log } = {}) {
+  if (process.env.CACHE_IMAGES === '0') return;
+  const rows = db.prepare("SELECT id, images FROM items WHERE images LIKE '%http%'").all();
+  if (!rows.length) return;
+  const upd = db.prepare("UPDATE items SET images = ? WHERE id = ?");
+  const cache = new Map();
+  let ok = 0, fail = 0;
+  for (const r of rows) {
+    const imgs = parseJSON(r.images, []);
+    let changed = false;
+    for (const [i, url] of imgs.entries()) {
+      if (!/^https?:\/\//.test(url)) continue;
+      try {
+        let local = cache.get(url);
+        if (!local) {
+          const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const type = res.headers.get('content-type') || '';
+          if (!/^image\//.test(type)) throw new Error('not an image');
+          const buf = Buffer.from(await res.arrayBuffer());
+          const ext = /png/.test(type) ? 'png' : /webp/.test(type) ? 'webp' : 'jpg';
+          const name = `${crypto.randomBytes(10).toString('hex')}.${ext}`;
+          fs.writeFileSync(path.join(UPLOAD_DIR, name), buf);
+          local = `/uploads/${name}`;
+          cache.set(url, local);
+        }
+        imgs[i] = local; changed = true; ok++;
+      } catch { fail++; }
+    }
+    // Читаємо свіжий рядок: адмін міг змінити фото, поки ми качали.
+    if (changed) {
+      const fresh = parseJSON(db.prepare('SELECT images FROM items WHERE id = ?').get(r.id)?.images, []);
+      const merged = fresh.map((u) => cache.get(u) || u);
+      upd.run(JSON.stringify(merged), r.id);
+    }
+  }
+  if (ok || fail) log(`Фото каталогу: збережено на диск ${ok}${fail ? `, не вдалося ${fail} (показуємо з оригінального сайту)` : ''}`);
+}
+
+module.exports = { seedIfEmpty, cacheRemoteImages, insertItem, ITEM_FIELDS };

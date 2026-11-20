@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!--META-->
+  <meta name="theme-color" content="#0A0E0D">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/img/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@500;600;700;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css?v=__V__">
+  <script src="/js/theme.js?v=__V__"></script>
+  <script src="/js/i18n.js?v=__V__" defer></script>
+  <script src="/js/app.js?v=__V__" defer></script>
+</head>
+<body>
+<a class="skip" href="#app" data-t="skip">Перейти до змісту</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="/" aria-label="БХ — на головну">
+      <img class="logo__mark" src="/img/logo.svg" alt="" width="40" height="40">
+      <span class="logo__txt"><b data-s="brand">БХ</b><small data-s="brand_sub">Цех обладнання для переробки</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Головне меню"></nav>
+    <div class="hdr__act">
+      <div class="lang" role="group" aria-label="Мова"><button type="button" data-lang="uk">UA</button><button type="button" data-lang="ru">RU</button><button type="button" data-lang="en">EN</button></div>
+      <button class="iconbtn theme" type="button" id="themeBtn" aria-label="Тема"></button>
+      <a class="iconbtn" href="/request" id="basketBtn" aria-label="Заявка"></a>
+      <a class="btn btn--acc btn--sm" href="/contacts#form" data-t="cta.order">Залишити заявку</a>
+      <button class="iconbtn burger" type="button" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="mnav"></button>
+    </div>
+  </div>
+</header>
+<div class="mnav" id="mnav"></div>
+
+<main id="app" tabindex="-1">
+  <!--SSR-->
+</main>
+
+<footer class="ftr" id="ftr"></footer>
+<div id="layer"></div>
+</body>
+</html>
