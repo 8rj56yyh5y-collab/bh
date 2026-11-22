@@ -247,6 +247,7 @@
       app.innerHTML = `<section class="sec"><div class="wrap"><div class="empty"><h3>${t('net.err')}</h3><p>${esc(e.message)}</p></div></div></section>`;
     }
     if (token !== navToken) return;
+    app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
     markNav();
     if (scroll) {
       if (location.hash) { const el = document.getElementById(location.hash.slice(1)); if (el) { setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 60); } else window.scrollTo(0, 0); }
@@ -275,12 +276,41 @@
     document.title = title;
     const m = $('meta[name=description]'); if (m && desc) m.content = desc;
   }
+  function animateCount(el) {
+    const to = Number(el.dataset.count); const pre = el.dataset.pre || '';
+    if (!to || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t0 = performance.now(), dur = 1400;
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / dur), e = 1 - (1 - k) ** 4;
+      el.textContent = pre + N(Math.round(to * e));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
   function observeReveal() {
-    const els = $$('.reveal:not(.in)');
+    $$('.stagger').forEach((g) => [...g.children].forEach((c, i) => c.style.setProperty('--i', Math.min(i, 8))));
+    $$('[data-count]').forEach((el) => { if (!el.dataset.counted) { el.dataset.counted = '1'; setTimeout(() => animateCount(el), 700); } });
+    const els = $$('.reveal:not(.in), .stagger:not(.in), .steps:not(.in)');
     if (!('IntersectionObserver' in window)) { els.forEach((el) => el.classList.add('in')); return; }
     const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
     els.forEach((el) => io.observe(el));
   }
+
+  // ── світло за курсором, компактна шапка, прогрес прокрутки
+  document.addEventListener('pointermove', (e) => {
+    const el = e.target.closest?.('.spot'); if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`); el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  }, { passive: true });
+  const bar = document.createElement('div'); bar.className = 'progress'; document.body.append(bar);
+  let ticking = false;
+  const onScroll = () => {
+    ticking = false;
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.setProperty('--p', h > 0 ? (scrollY / h).toFixed(4) : 0);
+    $('#hdr').classList.toggle('scrolled', scrollY > 10);
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
 
   // ── меню на телефоні
   function closeMenu() { $('#mnav').classList.remove('open'); $('#burger').setAttribute('aria-expanded', 'false'); $('#burger').innerHTML = icon('menu', 20); document.body.style.overflow = ''; }
@@ -326,7 +356,7 @@
   function card(it) {
     const inB = basket.has(it.id);
     const hl = (it.highlights || []).slice(0, 3);
-    return `<article class="card">
+    return `<article class="card spot">
       <div class="card__img">${imgOrArt(it)}<div class="card__badges">${badges(it)}</div></div>
       <div class="card__body">
         <div class="card__cat">${esc(catName(it.category))}</div>
@@ -424,22 +454,26 @@
     const capsItems = items.filter((x) => x.category === 'caps');
     const mq = t('marquee');
     app.innerHTML = `
-    <section class="hero"><div class="grid-bg"></div><div class="hero__glow"></div>
+    <section class="hero"><div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div><div class="grid-bg"></div>
       <div class="wrap">
         <div class="hero__in">
           <div>
             <div class="eyebrow"><span class="pulse"></span>&nbsp;${esc(t('hero.eyebrow', { city: S().city }))}</div>
-            <h1>${t('hero.h1a')} <span class="caps-word">${t('hero.h1b')}</span> <span class="acc">${t('hero.h1c')}</span></h1>
+            <h1 aria-label="${esc(`${t('hero.h1a')} ${t('hero.h1b')} ${t('hero.h1c')}`)}">${words([[t('hero.h1a'), ''], [t('hero.h1b'), 'caps-word'], [t('hero.h1c'), 'acc']])}</h1>
             <p class="lead">${t('hero.lead')}</p>
             <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn" href="/caps">${icon('caps', 18)} ${t('hero.cta2')}</a></div>
           </div>
-          <div class="flow">${flowSvg()}</div>
+          <div class="flow-wrap"><div class="flow" id="flow">${flowSvg()}
+            <span class="flow__badge"><span class="pulse"></span>${esc(t('flow.live'))}</span></div>
+            <div class="float-chip float-chip--a"><span class="ic">${icon('caps', 18)}</span><div><b class="mono">≈ 12 000</b><small>${esc(t('hero.f4'))}</small></div></div>
+            <div class="float-chip float-chip--b"><span class="ic">${icon('shredder', 18)}</span><div><b class="mono">40 ${lang === 'en' ? 'kg/h' : 'кг/год'}</b><small>${esc(t('flow.shred'))} 1,5 kW</small></div></div>
+          </div>
         </div>
         <div class="hero__facts">
-          <div><b class="mono">${META.counts.equipment || 0}</b><span>${t('hero.f1')}</span></div>
-          <div><b class="mono">4</b><span>${t('hero.f2')}</span></div>
+          <div><b class="mono" data-count="${META.counts.equipment || 0}">${META.counts.equipment || 0}</b><span>${t('hero.f1')}</span></div>
+          <div><b class="mono" data-count="4">4</b><span>${t('hero.f2')}</span></div>
           <div><b>${t('hero.f3v')}</b><span>${t('hero.f3')}</span></div>
-          <div><b class="mono">≈12 000</b><span>${t('hero.f4')}</span></div>
+          <div><b class="mono" data-count="12000" data-pre="≈">≈12 000</b><span>${t('hero.f4')}</span></div>
         </div>
       </div>
     </section>
@@ -457,7 +491,7 @@
 
     <section class="sec sec--panel"><div class="wrap">
       ${head(`<span class="num">02</span>&nbsp;${t('feat.eyebrow')}`, t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
-      <div class="cards">${eq.map(card).join('')}</div>
+      <div class="cards stagger">${eq.map(card).join('')}</div>
     </div></section>
 
     <section class="sec"><div class="wrap">${capsBand(capsItems)}</div></section>
@@ -469,30 +503,50 @@
 
     <section class="sec"><div class="wrap split">
       <div class="reveal"><div class="eyebrow"><span class="num">04</span>&nbsp;${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
-      <div class="feats reveal" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${[['factory', 1], ['cnc', 2], ['recycle', 3], ['wrench', 4]].map(([ic, i]) => `<div class="feat"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`why.${i}t`)}</h3><p>${t(`why.${i}p`)}</p></div>`).join('')}</div>
+      <div class="feats reveal" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${[['factory', 1], ['cnc', 2], ['recycle', 3], ['wrench', 4]].map(([ic, i]) => `<div class="feat spot"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`why.${i}t`)}</h3><p>${t(`why.${i}p`)}</p></div>`).join('')}</div>
     </div></section>
 
     <section class="sec sec--panel"><div class="wrap">
       ${head(`<span class="num">05</span>&nbsp;${t('pa.eyebrow')}`, t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
-      <div class="feats">${[['book', 1], ['users', 2], ['handshake', 3]].map(([ic, i]) => `<a class="feat reveal" href="/partners#f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p></a>`).join('')}
-        <a class="feat reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip chip--acc" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
+      <div class="feats">${[['book', 1], ['users', 2], ['handshake', 3]].map(([ic, i]) => `<a class="feat spot reveal" href="/partners#f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p></a>`).join('')}
+        <a class="feat spot reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip chip--acc" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
       </div>
     </div></section>
 
     ${faqBlock()}
     ${ctaBlock()}`;
     bindCalc();
+    bindTilt();
+  }
+  function words(parts) {
+    let i = 0;
+    return parts.map(([text, cls]) => {
+      const ws = String(text).split(/\s+/).filter(Boolean).map((w) => `<span class="wd" aria-hidden="true"><span style="--i:${i++}">${esc(w)}</span></span>`).join(' ');
+      return cls ? `<span class="${cls}">${ws}</span>` : ws;
+    }).join(' ');
+  }
+  function bindTilt() {
+    const el = $('#flow');
+    if (!el || matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return;
+    const wrap = el.parentElement;
+    wrap.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      el.style.setProperty('--ry', `${(x - .5) * 10}deg`); el.style.setProperty('--rx', `${(.5 - y) * 8}deg`);
+      el.style.setProperty('--gx', `${x * 100}%`); el.style.setProperty('--gy', `${y * 100}%`);
+    });
+    wrap.addEventListener('pointerleave', () => { el.style.setProperty('--ry', '0deg'); el.style.setProperty('--rx', '0deg'); });
   }
   function dirTile(i, href, ic, cats, cls = '') {
     const tags = cats ? cats.map((c) => catOf(c)).filter((c) => c && c.count).map((c) => `<span class="chip">${esc(c[lang] || c.uk)}</span>`).join('') : '';
     const artSvg = i === 2 ? art({ slug: 'lavka-home', kind: 'product' }, { dense: true, terrazzo: true, nobg: true }).replace('class="art"', '') : `<svg viewBox="0 0 24 24" fill="none" stroke="var(--acc-text)" stroke-width=".55" stroke-linecap="round" stroke-linejoin="round" opacity=".55">${I[ic]}</svg>`;
-    return `<a class="dir reveal ${cls}" href="${href}">
+    return `<a class="dir spot reveal ${cls}" href="${href}">
       <div class="dir__art" ${i === 2 ? 'style="opacity:.28"' : ''}>${artSvg}</div>
       <span class="dir__n">0${i} /</span><span class="dir__go">${icon('arrowUR', 20)}</span>
       <h3>${t(`dir${i}.t`)}</h3><p>${t(`dir${i}.p`)}</p>${tags ? `<div class="dir__tags">${tags}</div>` : ''}</a>`;
   }
   function stepsBlock(prefix, icons) {
-    return `<div class="steps reveal">${icons.map((ic, i) => `<div class="step"><span class="step__n">0${i + 1}</span><span class="step__icon">${icon(ic, 22)}</span><h3>${t(`${prefix}.${i + 1}t`)}</h3><p>${t(`${prefix}.${i + 1}p`)}</p></div>`).join('')}</div>`;
+    return `<div class="steps reveal">${icons.map((ic, i) => `<div class="step" style="--i:${i}"><span class="step__n">0${i + 1}</span><span class="step__icon">${icon(ic, 22)}</span><h3>${t(`${prefix}.${i + 1}t`)}</h3><p>${t(`${prefix}.${i + 1}p`)}</p></div>`).join('')}</div>`;
   }
   function capsBand(items = []) {
     const pic = art({ slug: 'caps-band-terrazzo', kind: 'product' }, { dense: true, terrazzo: true });
@@ -505,12 +559,14 @@
           <div class="calc__row"><label for="calcR">${t('calc.label')}</label><div class="seg" role="group"><button type="button" class="on" data-unit="caps">${t('calc.byCaps')}</button><button type="button" data-unit="kg">${t('calc.byKg')}</button></div></div>
           <div class="calc__val"><span id="calcV">12 000</span> <small id="calcU">${t('calc.caps')}</small></div>
           <input id="calcR" type="range" min="1000" max="200000" step="1000" value="12000" aria-label="${esc(t('calc.label'))}">
+          <div class="benches" id="benches" aria-hidden="true"></div>
           <div class="calc__out"><div><b id="cB">1</b><span>${t('calc.bench')}</span></div><div><b id="cU">2</b><span>${t('calc.bin')}</span></div><div><b id="cM">10</b><span>${t('calc.beam')}</span></div></div>
           <p class="calc__hint">${t('calc.hint')}</p>
         </div>
         <div class="hero__cta"><a class="btn btn--acc" href="/caps#order">${t('caps.cta1')} ${icon('arrow', 18)}</a><a class="btn" href="/caps#handover">${icon('recycle', 18)} ${t('caps.cta2')}</a></div>
       </div>
       <div class="caps__art">${pic.replace('class="art"', '')}
+        <div class="caps__big"><b class="mono" id="capsBig">12 000</b><span>${t('calc.caps')} → 1 ${t('calc.bench')}</span></div>
         ${items.length ? `<div style="position:absolute;left:20px;right:20px;bottom:20px;display:flex;gap:8px;flex-wrap:wrap">${items.slice(0, 4).map((it) => { remember([it]); return `<a class="chip" style="background:rgba(10,14,13,.82);color:#EEF3EF;border-color:rgba(255,255,255,.14);padding:8px 13px" href="${itemUrl(it)}">${esc(L(it, 'title'))}</a>`; }).join('')}</div>` : ''}
       </div>
     </div>`;
@@ -526,6 +582,13 @@
       $('#calcU').textContent = unit === 'caps' ? t('calc.caps') : t('calc.kg');
       const f = (x) => (x >= 10 ? N(Math.floor(x)) : (Math.floor(x * 10) / 10).toLocaleString(lang === 'en' ? 'en-US' : 'uk-UA'));
       $('#cB').textContent = f(kg / 30); $('#cU').textContent = f(kg / 12); $('#cM').textContent = f(kg / 3);
+      r.style.setProperty('--fill', `${((v - r.min) / (r.max - r.min)) * 100}%`);
+      const caps = Math.round((kg * 1000) / 2.5);
+      const big = $('#capsBig'); if (big) { big.textContent = N(caps); big.nextElementSibling.textContent = `${t('calc.caps')} → ${f(kg / 30)} ${t('calc.bench')}`; }
+      const n = kg / 30, MAX = 12;
+      const benchSvg = '<svg viewBox="0 0 30 22" fill="currentColor"><rect x="1" y="2" width="28" height="4" rx="1.5"/><rect x="1" y="9" width="28" height="4" rx="1.5"/><rect x="4" y="13" width="3" height="9" rx="1"/><rect x="23" y="13" width="3" height="9" rx="1"/></svg>';
+      $('#benches').innerHTML = Array.from({ length: Math.min(MAX, Math.max(1, Math.ceil(n))) }, (_, i) => `<span class="bench ${i + 1 <= n ? 'on' : 'part'}">${benchSvg}</span>`).join('')
+        + (n > MAX ? `<span class="benches__more">+${N(Math.floor(n) - MAX)}</span>` : '');
     };
     $$('[data-unit]', box).forEach((b) => b.addEventListener('click', () => {
       if (b.dataset.unit === unit) return;
@@ -576,7 +639,7 @@
       if (sort === 'price_asc') list = [...list].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
       if (sort === 'price_desc') list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
       if (sort === 'new') list = [...list].sort((a, b) => b.id - a.id);
-      $('#grid').innerHTML = list.length ? `<div class="cards">${list.map(card).join('')}</div>`
+      $('#grid').innerHTML = list.length ? `<div class="cards stagger in">${list.map(card).join('')}</div>`
         : `<div class="empty"><h3>${t('empty.title')}</h3><p>${t('empty.text')}</p><p style="margin-top:16px"><a class="btn btn--acc btn--sm" href="/contacts?topic=custom#form">${t('empty.cta')}</a></p></div>`;
       const u = new URLSearchParams(); if (cat) u.set('cat', cat); if (search) u.set('q', search); if (sort) u.set('sort', sort);
       history.replaceState(null, '', `${location.pathname}${u.toString() ? `?${u}` : ''}`);
@@ -650,7 +713,7 @@
           </aside>
         </div>
       </div>
-      ${related.length ? `<section class="sec sec--panel"><div class="wrap">${head(t('item.related'), catName(it.category), '')}<div class="cards">${related.map(card).join('')}</div></div></section>` : ''}
+      ${related.length ? `<section class="sec sec--panel"><div class="wrap">${head(t('item.related'), catName(it.category), '')}<div class="cards stagger">${related.map(card).join('')}</div></div></section>` : ''}
       ${ctaBlock()}
       <div class="sticky-buy">${priceHtml(it)}<button type="button" class="btn btn--acc btn--sm" id="orderBtn2">${t('item.order')}</button></div>`;
     document.body.classList.add('has-sticky');
@@ -728,7 +791,7 @@
         <div class="crumbs"><a href="/">${t('nav.home')}</a><span>${t('nav.services')}</span></div>
         <h1>${t('sv.title')}</h1><p class="lead">${t('sv.lead')}</p>
       </div></section>
-      <section class="sec"><div class="wrap"><div class="cards cards--3">${items.map(card).join('')}</div></div></section>
+      <section class="sec"><div class="wrap"><div class="cards cards--3 stagger">${items.map(card).join('')}</div></div></section>
       ${stepsSection()}
       <section class="sec" id="form"><div class="wrap split">
         <div class="reveal"><div class="eyebrow">${t('nav.services')}</div><h2>${t('sv.formTitle')}</h2><p class="lead" style="margin-top:18px">${t('sv.formLead')}</p></div>
@@ -753,12 +816,12 @@
       <section class="sec--tight" style="padding-top:0"><div class="wrap">${capsBand([])}</div></section>
       <section class="sec"><div class="wrap">
         ${head(t('nav.caps'), t('capsP.title'), t('capsF.lead'))}
-        <div class="cards">${capsItems.map(card).join('')}${svc ? card(svc) : ''}</div>
+        <div class="cards stagger">${capsItems.map(card).join('')}${svc ? card(svc) : ''}</div>
       </div></section>
       <section class="sec sec--panel"><div class="wrap">${head(t('caps.eyebrow'), t('capsP.how'), '')}${stepsBlock('capsS', ['caps', 'shredder', 'flame', 'wrench', 'sparkle', 'recycle'])}</div></section>
       <section class="sec"><div class="wrap">
         ${head(t('pa.eyebrow'), t('capsG.title'), '')}
-        <div class="feats">${[['school', 1], ['building', 2], ['chart', 3]].map(([ic, i]) => `<div class="feat reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`capsG.${i}t`)}</h3><p>${t(`capsG.${i}p`)}</p></div>`).join('')}</div>
+        <div class="feats">${[['school', 1], ['building', 2], ['chart', 3]].map(([ic, i]) => `<div class="feat spot reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`capsG.${i}t`)}</h3><p>${t(`capsG.${i}p`)}</p></div>`).join('')}</div>
       </div></section>
       <section class="sec sec--panel" id="order"><div class="wrap split">
         <div class="reveal"><div class="eyebrow">${t('caps.cta1')}</div><h2>${t('capsF.title')}</h2><p class="lead" style="margin-top:18px">${t('capsF.lead')}</p></div>
@@ -785,7 +848,7 @@
         <div class="hero__cta" style="margin-top:28px"><a class="btn btn--acc" href="#form">${t('pa.join')} ${icon('arrow', 18)}</a></div>
       </div></section>
       <section class="sec"><div class="wrap">
-        <div class="feats">${icons.map((ic, k) => { const i = k + 1; return `<div class="feat reveal" id="f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p><ul>${t(`pa.${i}l`).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${i === 6 ? `<a class="btn btn--sm" href="/careers">${t('nav.careers')} ${icon('arrow', 16)}</a>` : `<a class="btn btn--sm" href="#form" data-fmt="${['teach', 'learn', 'dealer', 'supply', 'joint'][k]}">${t('pa.join')}</a>`}</div>`; }).join('')}</div>
+        <div class="feats">${icons.map((ic, k) => { const i = k + 1; return `<div class="feat spot reveal" id="f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p><ul>${t(`pa.${i}l`).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>${i === 6 ? `<a class="btn btn--sm" href="/careers">${t('nav.careers')} ${icon('arrow', 16)}</a>` : `<a class="btn btn--sm" href="#form" data-fmt="${['teach', 'learn', 'dealer', 'supply', 'joint'][k]}">${t('pa.join')}</a>`}</div>`; }).join('')}</div>
       </div></section>
       <section class="sec sec--panel" id="form"><div class="wrap split">
         <div class="reveal"><div class="eyebrow">${t('pa.eyebrow')}</div><h2>${t('pa.formTitle')}</h2><p class="lead" style="margin-top:18px">${t('pa.formLead')}</p></div>
@@ -816,7 +879,7 @@
       </div></section>
       <section class="sec sec--panel"><div class="wrap">
         ${head(t('job.eyebrow'), t('job.why'), '')}
-        <div class="feats">${[['wrench', 1], ['book', 2], ['shield', 3], ['recycle', 4]].map(([ic, i]) => `<div class="feat reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`job.w${i}t`)}</h3><p>${t(`job.w${i}p`)}</p></div>`).join('')}</div>
+        <div class="feats">${[['wrench', 1], ['book', 2], ['shield', 3], ['recycle', 4]].map(([ic, i]) => `<div class="feat spot reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`job.w${i}t`)}</h3><p>${t(`job.w${i}p`)}</p></div>`).join('')}</div>
       </div></section>
       <section class="sec"><div class="wrap"><div class="cta reveal"><div class="cta__grid"></div><div style="position:relative"><h2>${t('job.open')}</h2><p>${t('job.openP')}</p></div><div class="cta__act" style="position:relative"><button type="button" class="btn btn--dark" data-apply="">${t('job.openBtn')} ${icon('arrow', 18)}</button></div></div></div></section>`;
     $$('[data-apply]').forEach((b) => b.addEventListener('click', () => openRequestModal({ type: 'job', vacancy: b.dataset.apply, vacancies })));
@@ -851,7 +914,7 @@
       </div></section>
       <section class="sec sec--panel"><div class="wrap">
         ${head(t('ab.values'), t('ab.values'), '')}
-        <div class="feats">${[['eye', 1], ['recycle', 2], ['users', 3]].map(([ic, i]) => `<div class="feat reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`ab.v${i}t`)}</h3><p>${t(`ab.v${i}p`)}</p></div>`).join('')}</div>
+        <div class="feats">${[['eye', 1], ['recycle', 2], ['users', 3]].map(([ic, i]) => `<div class="feat spot reveal"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`ab.v${i}t`)}</h3><p>${t(`ab.v${i}p`)}</p></div>`).join('')}</div>
       </div></section>
       ${ctaBlock()}`;
   }

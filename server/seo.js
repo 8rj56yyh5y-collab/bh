@@ -17,7 +17,7 @@ function getTemplate() {
   const st = fs.statSync(TEMPLATE_PATH);
   if (!template || st.mtimeMs !== templateMtime) {
     // Версія файлів у посиланнях (?v=…) — щоб після оновлення сайту браузери не тримали старі css/js.
-    const ver = ['css/app.css', 'js/app.js', 'js/i18n.js', 'js/admin.js']
+    const ver = ['css/app.css', 'css/fx.css', 'js/app.js', 'js/i18n.js', 'js/admin.js']
       .map((f) => { try { return fs.statSync(path.join(__dirname, '..', 'public', f)).mtimeMs; } catch { return 0; } })
       .reduce((a, b) => a + b, 0).toString(36).slice(-8);
     template = fs.readFileSync(TEMPLATE_PATH, 'utf8').replaceAll('__V__', ver);
