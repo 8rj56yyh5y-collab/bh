@@ -25,12 +25,12 @@ window.BH_STORY = (() => {
     let pile = '';
     for (let i = 0; i < 60; i++) {
       const x = 130 + r() * 200, y = 255 + r() * 70 - (x - 230) ** 2 / 650;
-      pile += `<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)}) rotate(${Math.floor(r() * 360)})">${piece(i % 3, MAT[i % MAT.length])}</g>`;
+      pile += `<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)}) rotate(${Math.floor(r() * 360)})">${piece(1 + (i % 2), MAT[i % MAT.length])}</g>`;
     }
     let fall = '';
     for (let i = 0; i < 12; i++) {
       const x = 150 + (i % 6) * 30;
-      fall += `<g class="sf-fall" style="animation-delay:${(i * 0.34).toFixed(2)}s"><g transform="translate(${x} 60) rotate(${i * 37})">${piece(i % 3, MAT[(i * 3) % MAT.length])}</g></g>`;
+      fall += `<g class="sf-fall" style="animation-delay:${(i * 0.34).toFixed(2)}s"><g transform="translate(${x} 60) rotate(${i * 37})">${piece(1 + (i % 2), MAT[(i * 3) % MAT.length])}</g></g>`;
     }
     let flakes = '';
     for (let i = 0; i < 22; i++) {
@@ -110,7 +110,7 @@ window.BH_STORY = (() => {
     </svg>`;
   }
 
-  function mount(root, { t, esc, icon, stat5 }) {
+  function mount(root, { t, esc, icon }) {
     const steps = [1, 2, 3, 4, 5];
     const L = steps.map((i) => esc(t(`story.s${i}t`)).toUpperCase());
     root.innerHTML = `<div class="wrap">
@@ -121,10 +121,10 @@ window.BH_STORY = (() => {
           <ol class="story__steps">${steps.map((i) => `<li><button type="button" class="story__step" data-s="${i - 1}">
             <span class="story__n mono">0${i}</span>
             <span class="story__body"><b>${t(`story.s${i}t`)}</b><span class="story__text">${t(`story.s${i}p`)}</span>
-              <span class="story__stat"><b class="mono">${esc(i === 5 && stat5 ? stat5 : t(`story.s${i}v`))}</b> ${t(`story.s${i}l`)}</span></span>
+              <span class="story__stat"><b class="mono">${esc(t(`story.s${i}v`))}</b> ${t(`story.s${i}l`)}</span></span>
             <span class="story__bar"><i></i></span>
           </button></li>`).join('')}</ol>
-          <div class="story__cta"><a class="btn btn--acc btn--sm" href="/equipment">${t('story.cta')} ${icon('arrow', 16)}</a><a class="btn btn--sm" href="/solutions">${t('story.cta2')}</a></div>
+          <div class="story__cta"><a class="btn btn--acc btn--sm" href="/equipment?cat=plastic">${t('story.cta')} ${icon('arrow', 16)}</a><a class="btn btn--sm" href="/products?cat=caps">${t('story.cta2')}</a></div>
         </div>
       </div>
     </div>`;

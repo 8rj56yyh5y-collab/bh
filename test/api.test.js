@@ -26,7 +26,13 @@ const req = async (url, opts = {}) => {
 test('каталог: усе обладнання з маркетплейсу на місці', async () => {
   const { body } = await req('/api/items?kind=equipment');
   const titles = body.items.map((i) => i.title).join(' | ');
-  for (const w of ['Дробарка', 'екструдер', 'пелет', 'тигель', 'мультиліфта', 'Модульний', 'фітоламп', 'буржуйка', 'Карпати']) assert.match(titles, new RegExp(w, 'i'));
+  for (const w of ['Дробарка', 'екструдер', 'тигель', 'мультиліфта', 'Модульний', 'фітоламп', 'буржуйка']) assert.match(titles, new RegExp(w, 'i'));
+  // пелетна лінія й «Карпати» — окреме підприємство, до БХ не належать
+  assert.doesNotMatch(titles, /пелет|Карпати/i);
+  const byOrigin = Object.fromEntries(body.items.map((i) => [i.slug, i.origin]));
+  assert.equal(byOrigin['forma-dlya-lyttya-hryppa-100-g'], 'own');
+  assert.equal(byOrigin['modulnyi-zbirno-rozbirnyi-kontejner-pir-100'], 'order');
+  assert.equal(byOrigin['komplekt-led-fitolamp-1600-vt'], 'supply');
   const meta = (await req('/api/meta')).body;
   assert.ok(meta.counts.product >= 8 && meta.counts.service >= 5);
 });
@@ -96,7 +102,7 @@ test('адмінка: додати, змінити, приховати та ви
   const ex2 = (await req('/api/items/drobarka-dlya-plastyku-1-5-kvt')).body.item;
   assert.equal(ex2.price, 36000);
   assert.equal(ex2.extra.how.length, ex.extra.how.length);
-  assert.equal((await req('/solutions')).status, 200);
+  assert.equal((await req('/solutions')).status, 404);
   assert.equal((await req(`/api/admin/items/${c.body.item.id}`, { method: 'DELETE' })).status, 200);
   assert.equal((await fetch(base + up.body.url)).status, 404);
 });

@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { db, UPLOAD_DIR, FILES_DIR, getSettings, setSettings, parseJSON } = require('./db');
-const { KINDS, CATEGORIES, REQUEST_TYPES, REQUEST_STATUSES, PRICE_TYPES, AVAILABILITY } = require('./catalog');
+const { KINDS, CATEGORIES, REQUEST_TYPES, REQUEST_STATUSES, PRICE_TYPES, AVAILABILITY, ORIGINS } = require('./catalog');
 const U = require('./util');
 const { HttpError, str, int, bool, clamp } = U;
 const { seedIfEmpty, cacheRemoteImages, ITEM_FIELDS } = require('./seed');
@@ -104,7 +104,7 @@ function itemOut(r, full = false) {
   if (!full) { delete o.extra; delete o.description; delete o.description_ru; delete o.description_en; delete o.specs; delete o.source_url; }
   return o;
 }
-const LIST_COLS = 'id, slug, kind, category, title, title_ru, title_en, summary, summary_ru, summary_en, highlights, price, price_type, price_note, unit, availability, lead_time, rent, custom, plastic_kg, images, featured, sort';
+const LIST_COLS = 'id, slug, kind, category, origin, title, title_ru, title_en, summary, summary_ru, summary_en, highlights, price, price_type, price_note, unit, availability, lead_time, rent, custom, plastic_kg, images, featured, sort';
 
 function listItems(q) {
   const where = ['published = 1'];
@@ -214,6 +214,7 @@ function itemFromBody(b, existing = {}) {
   o.price_note = str(b.price_note, 200);
   o.unit = str(b.unit, 20) || 'шт.';
   o.availability = AVAILABILITY.includes(b.availability) ? b.availability : 'order';
+  o.origin = ORIGINS.includes(b.origin) ? b.origin : existing.origin || 'own';
   o.lead_time = str(b.lead_time, 80);
   o.rent = bool(b.rent); o.custom = bool(b.custom); o.featured = bool(b.featured);
   o.published = b.published === undefined ? 1 : bool(b.published);

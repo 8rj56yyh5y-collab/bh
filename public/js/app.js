@@ -149,7 +149,7 @@
   };
 
   // ── оболонка: шапка, меню, підвал
-  const NAV = [['/equipment', 'nav.equipment'], ['/solutions', 'nav.solutions'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/contacts', 'nav.contacts']];
+  const NAV = [['/equipment', 'nav.equipment'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/contacts', 'nav.contacts']];
   function renderShell() {
     document.documentElement.lang = lang === 'uk' ? 'uk' : lang;
     $('[data-s="brand"]').textContent = S().brand;
@@ -202,7 +202,7 @@
         </div>
         <div><h4>${t('ft.catalog')}</h4><ul>${cats.map((c) => `<li><a href="/equipment?cat=${c.slug}">${esc(c[lang] || c.uk)}</a></li>`).join('')}<li><a href="/caps">${t('nav.caps')}</a></li><li><a href="/services">${t('nav.services')}</a></li></ul></div>
         <div><h4>${t('ft.company')}</h4><ul>
-          <li><a href="/about">${t('nav.about')}</a></li><li><a href="/solutions">${t('sol.pageTitle')}</a></li><li><a href="/partners">${t('nav.partners')}</a></li><li><a href="/careers">${t('nav.careers')}</a></li><li><a href="/contacts">${t('nav.contacts')}</a></li>
+          <li><a href="/about">${t('nav.about')}</a></li><li><a href="/partners">${t('nav.partners')}</a></li><li><a href="/careers">${t('nav.careers')}</a></li><li><a href="/contacts">${t('nav.contacts')}</a></li>
           ${s.marketplace_url ? `<li><a href="${esc(s.marketplace_url)}" target="_blank" rel="noopener">${t('ft.marketplace')} ↗</a></li>` : ''}
         </ul></div>
         <div><h4>${t('ft.contacts')}</h4><ul>
@@ -227,7 +227,7 @@
   const ROUTES = [
     [/^\/$/, pageHome], [/^\/equipment\/?$/, () => pageCatalog('equipment')], [/^\/products\/?$/, () => pageCatalog('product')],
     [/^\/services\/?$/, pageServices], [/^\/(equipment|products|services)\/([a-z0-9-]+)\/?$/, (m) => pageItem(m[2])],
-    [/^\/caps\/?$/, pageCaps], [/^\/solutions\/?$/, pageSolutions], [/^\/partners\/?$/, pagePartners], [/^\/careers\/?$/, pageCareers], [/^\/about\/?$/, pageAbout],
+    [/^\/caps\/?$/, pageCaps], [/^\/partners\/?$/, pagePartners], [/^\/careers\/?$/, pageCareers], [/^\/about\/?$/, pageAbout],
     [/^\/contacts\/?$/, pageContacts], [/^\/request\/?$/, pageBasket], [/^\/admin\/?$/, pageAdmin],
   ];
   let navToken = 0;
@@ -302,12 +302,10 @@
     const r = el.getBoundingClientRect();
     el.style.setProperty('--mx', `${e.clientX - r.left}px`); el.style.setProperty('--my', `${e.clientY - r.top}px`);
   }, { passive: true });
-  const bar = document.createElement('div'); bar.className = 'progress'; document.body.append(bar);
   let ticking = false;
   const onScroll = () => {
     ticking = false;
     const h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.setProperty('--p', h > 0 ? (scrollY / h).toFixed(4) : 0);
     $('#hdr').classList.toggle('scrolled', scrollY > 10);
   };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
@@ -341,10 +339,12 @@
     setTimeout(() => el.remove(), ms);
   }
   const head = (eyebrow, title, lead, extra = '') => `<div class="sec__head reveal"><div><div class="eyebrow">${eyebrow}</div><h2>${title}</h2></div>${lead ? `<p>${lead}</p>` : ''}${extra}</div>`;
+  const originText = (it) => t(`origin.${it.origin || 'own'}`);
   function badges(it) {
     const b = [];
+    if (it.origin && it.origin !== 'own') b.push(`<span class="chip">${originText(it)}</span>`);
     if (it.availability === 'stock') b.push(`<span class="chip"><span class="dot" style="color:var(--ok)"></span>${t('badge.stock')}</span>`);
-    else b.push(`<span class="chip">${t(`badge.${it.availability}`)}</span>`);
+    else if (it.origin !== 'order') b.push(`<span class="chip">${t(`badge.${it.availability}`)}</span>`);
     if (it.rent) b.push(`<span class="chip">${t('badge.rent')}</span>`);
     return b.join('');
   }
@@ -354,14 +354,12 @@
   }
   function card(it) {
     const inB = basket.has(it.id);
-    const hl = (it.highlights || []).slice(0, 3);
-    return `<article class="card spot">
-      <div class="card__img">${imgOrArt(it)}<div class="card__badges">${badges(it)}</div></div>
+    return `<article class="card">
+      <div class="card__img">${imgOrArt(it)}</div>
       <div class="card__body">
-        <div class="card__cat">${esc(catName(it.category))}</div>
+        <div class="card__cat">${esc(catName(it.category))}${it.origin && it.origin !== 'own' ? ` · ${originText(it)}` : ''}</div>
         <h3 class="card__title"><a href="${itemUrl(it)}">${esc(L(it, 'title'))}</a></h3>
         <p class="card__sum">${esc(L(it, 'summary'))}</p>
-        ${hl.length ? `<div class="card__hl">${hl.map(([v, l]) => `<span title="${esc(l)}">${esc(v)}</span>`).join('')}</div>` : ''}
         <div class="card__foot">${priceHtml(it)}<button type="button" class="btn btn--xs card__add ${inB ? 'on' : ''}" data-add="${it.id}">${icon(inB ? 'check' : 'plus', 15, 2.2)} ${t(inB ? 'card.added' : 'card.add')}</button></div>
       </div></article>`;
   }
@@ -445,209 +443,54 @@
   }
 
   // ── ГОЛОВНА
-  // Вторсировина → продукт: що з якої сировини виходить і на якому обладнанні.
-  const MATERIALS = [
-    { id: 'metal', icon: 'anvil', products: ['manhal-hryl-ruchnoi-roboty', 'pich-burzhuika-z-dymokhodom', 'kontejner-dlya-multylifta-scania'], extra: [['sinkers', '/solutions#foundry']], eq: ['elektrychnyi-tyhel-dlya-plavlennya', 'forma-dlya-lyttya-kraplya-100-g', 'plazmova-rizka-metalu-chpu'] },
-    { id: 'plastic', icon: 'recycle', products: ['plastykovyi-brus-ta-doshka', 'lavka-z-pereroblenoho-plastyku', 'urna-ta-smittievyi-bak', 'lysty-i-paneli-z-plastyku'], eq: ['drobarka-dlya-plastyku-1-5-kvt', 'shnekovyi-ekstruder-dlya-plastyku'] },
-    { id: 'glass', icon: 'glass', products: ['sklyanky-z-plyashok', 'vazy-ta-posud-zi-skla'], eq: ['lazerne-hraviyuvannya-chpu'] },
-    { id: 'wood', icon: 'pellet', products: [], extra: [['pellets', '/equipment/liniya-vyrobnytstva-pelet-1-t-god']], eq: ['liniya-vyrobnytstva-pelet-1-t-god', 'derevoobrobne-pidpryiemstvo-karpaty'] },
-  ];
-  const EXTRA_LABEL = { 'sinkers': ['Рибальські грузила', 'Рыболовные грузила', 'Fishing sinkers'], pellets: ['Паливні пелети', 'Топливные пеллеты', 'Fuel pellets'] };
-  function materialsBlock(bySlug) {
-    const link = (it) => `<li><a href="${itemUrl(it)}"><span>${esc(L(it, 'title'))}</span>${it.price != null && it.price_type !== 'request' ? `<em>${esc(priceText(it))}</em>` : '<em>→</em>'}</a></li>`;
-    return `<div class="mats stagger">${MATERIALS.map((m) => `<div class="mat spot">
-      <div class="mat__top"><span class="mat__icon">${icon(m.icon, 24)}</span><div><h3>${t(`mat.${m.id}`)}</h3><small>${t(`mat.${m.id}S`)}</small></div></div>
-      <div class="mat__arrow" aria-hidden="true">${icon('arrow', 18)}</div>
-      <p class="mat__h">${t('mat.makes')}</p>
-      <ul class="mat__list">${m.products.map((sl) => bySlug.get(sl)).filter(Boolean).map(link).join('')}${(m.extra || []).map(([k, href]) => `<li><a href="${href}"><span>${esc(TL(EXTRA_LABEL[k]))}</span><em>→</em></a></li>`).join('')}</ul>
-      <p class="mat__h">${t('mat.uses')}</p>
-      <div class="mat__eq">${m.eq.map((sl) => bySlug.get(sl)).filter(Boolean).map((it) => `<a class="chip" href="${itemUrl(it)}">${esc(L(it, 'title'))}</a>`).join('')}</div>
-    </div>`).join('')}</div>`;
-  }
-
   async function pageHome() {
     setTitle(`${S().brand} — ${t('hero.h1a').toLowerCase()} ${t('hero.h1b')} ${t('hero.h1c')}`, t('hero.lead'));
-    const { items } = await cached('/api/items?featured=1');
+    const { items } = await cached('/api/items?kind=equipment');
     remember(items);
-    const bySlug = await allBySlug();
-    const eq = items.filter((x) => x.kind === 'equipment').slice(0, 8);
-    const mq = t('marquee');
+    const own = items.filter((x) => (x.origin || 'own') === 'own').slice(0, 6);
+    const dirs = [[1, '/equipment'], [2, '/products'], [3, '/services'], [4, '/contacts?topic=custom#form']];
     app.innerHTML = `
-    <section class="hero"><div class="aurora" aria-hidden="true"><i></i><i></i></div><div class="grid-bg"></div>
+    <section class="hero"><div class="grid-bg"></div>
       <div class="wrap">
         <div class="hero__in">
           <div>
-            <div class="eyebrow"><span class="pulse"></span>&nbsp;${esc(t('hero.eyebrow', { city: S().city }))}</div>
-            <h1 aria-label="${esc(`${t('hero.h1a')} ${t('hero.h1b')} ${t('hero.h1c')}`)}">${words([[`${t('hero.h1a')} ${t('hero.h1b')}`, ''], [t('hero.h1c'), 'acc']])}</h1>
+            <div class="eyebrow">${esc(t('hero.eyebrow', { city: S().city }))}</div>
+            <h1>${t('hero.h1a')} ${t('hero.h1b')} <span class="acc">${t('hero.h1c')}</span></h1>
             <p class="lead">${t('hero.lead')}</p>
-            <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn" href="/solutions">${t('hero.cta2')}</a></div>
+            <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn btn--ghost" href="/contacts?topic=custom#form">${t('hero.cta2')}</a></div>
           </div>
-          <div class="flow-wrap"><div class="flow" id="flow">${flowSvg()}
-            <span class="flow__badge"><span class="pulse"></span>${esc(t('flow.live'))}</span></div>
-          </div>
-        </div>
-        <div class="hero__facts">
-          <div><b class="mono" data-count="${META.counts.equipment || 0}">${META.counts.equipment || 0}</b><span>${t('hero.f1')}</span></div>
-          <div><b class="mono" data-count="4">4</b><span>${t('hero.f2')}</span></div>
-          <div><b>${t('hero.f3v')}</b><span>${t('hero.f3')}</span></div>
-          <div><b class="mono" data-count="4">4</b><span>${t('hero.f4')}</span></div>
+          <div class="flow">${flowSvg()}</div>
         </div>
       </div>
     </section>
-    <div class="marquee" aria-hidden="true"><div class="marquee__in">${[...mq, ...mq].map((x) => `<span>${esc(x)}</span>`).join('')}</div></div>
 
     <section class="sec"><div class="wrap">
-      ${head(t('dirs.eyebrow'), t('dirs.title'), t('dirs.lead'))}
-      <div class="dirs">
-        ${dirTile(1, '/equipment', 'shredder', ['plastic', 'foundry', 'biomass'])}
-        ${dirTile(2, '/products', 'recycle', ['caps', 'glass', 'metal'])}
-        ${dirTile(3, '/services', 'cnc', null)}
-        ${dirTile(4, '/contacts?topic=custom#form', 'blueprint', ['containers', 'agro', 'heating'])}
-      </div>
+      <div class="sec__head reveal"><div><div class="eyebrow">${t('dirs.eyebrow')}</div><h2>${t('dirs.title')}</h2></div><p>${t('dirs.lead')}</p></div>
+      <div class="svc-list">${dirs.map(([i, href]) => `<a class="svc reveal" href="${href}"><span class="svc__n mono">0${i}</span><div><h3>${t(`dir${i}.t`)}</h3><p>${t(`dir${i}.p`)}</p></div><span class="svc__go">${icon('arrow', 20)}</span></a>`).join('')}</div>
     </div></section>
 
     <section class="story sec--panel" id="story" aria-label="${esc(t('story.eyebrow'))}"></section>
 
     <section class="sec"><div class="wrap">
-      ${head(t('mat.eyebrow'), t('mat.title'), t('mat.lead'))}
-      ${materialsBlock(bySlug)}
+      <div class="sec__head reveal"><div><div class="eyebrow">${t('feat.eyebrow')}</div><h2>${t('feat.title')}</h2></div><a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a></div>
+      <div class="cards">${own.map(card).join('')}</div>
     </div></section>
 
-    <section class="sec sec--panel"><div class="wrap">
-      ${head(t('feat.eyebrow'), t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
-      <div class="cards stagger">${eq.map(card).join('')}</div>
+    <section class="sec sec--panel"><div class="wrap duo">
+      <a class="duo__item reveal" href="/partners"><div class="eyebrow">${t('pa.eyebrow')}</div><h3>${t('pa.title')}</h3><p>${t('pa.lead')}</p><span class="link">${t('pa.join')} →</span></a>
+      <a class="duo__item reveal" href="/careers"><div class="eyebrow">${t('job.eyebrow')}</div><h3>${t('job.title')}</h3><p>${t('job.lead')}</p><span class="link">${t('nav.careers')}${META.vacancies ? ` · ${META.vacancies}` : ''} →</span></a>
     </div></section>
 
-    <section class="sec"><div class="wrap">
-      ${head(t('sol.eyebrow'), t('sol.title'), t('sol.lead'), `<a class="btn btn--sm" href="/solutions">${t('sol.all')} ${icon('arrow', 16)}</a>`)}
-      <div class="sols stagger">${SOLS.map((x) => solCard(x, bySlug)).join('')}</div>
-    </div></section>
-
-    <section class="sec sec--panel"><div class="wrap split">
-      <div class="reveal"><div class="eyebrow">${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
-      <div class="feats reveal" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${[['factory', 1], ['cnc', 2], ['recycle', 3], ['wrench', 4]].map(([ic, i]) => `<div class="feat spot"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`why.${i}t`)}</h3><p>${t(`why.${i}p`)}</p></div>`).join('')}</div>
-    </div></section>
-
-    <section class="sec"><div class="wrap">
-      ${head(t('pa.eyebrow'), t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
-      <div class="feats">${[['book', 1], ['users', 2], ['handshake', 3]].map(([ic, i]) => `<a class="feat spot reveal" href="/partners#f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p></a>`).join('')}
-        <a class="feat spot reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
-      </div>
-    </div></section>
-
-    ${faqBlock()}
     ${ctaBlock()}`;
-    bindTilt();
-    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon, stat5: `${(META.counts.product || 0)}+` });
+    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon });
     observeReveal();
   }
 
-  // ── рішення під ключ
-  const SOLS = window.BH_SOLUTIONS || [];
   const TL = (arr) => (Array.isArray(arr) ? arr[LI()] || arr[0] : arr);
   async function allBySlug() {
     const { items } = await cached('/api/items');
     remember(items);
     return new Map(items.map((x) => [x.slug, x]));
-  }
-  function solTotal(sol, bySlug, mult = 1) {
-    let sum = 0, partial = false;
-    for (const [slug, q] of sol.items) {
-      const it = bySlug.get(slug);
-      const qty = slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q;
-      if (!it || it.price == null || it.price_type === 'request') { partial = true; continue; }
-      sum += it.price * qty;
-    }
-    return { sum, partial };
-  }
-  function solCard(sol, bySlug) {
-    const { sum, partial } = solTotal(sol, bySlug);
-    return `<a class="sol spot" href="/solutions#${sol.id}" style="--c:${sol.color}">
-      <span class="sol__icon">${icon(sol.icon, 26)}</span>
-      <h3>${esc(TL(sol.title))}</h3>
-      <p>${esc(TL(sol.lead))}</p>
-      <div class="chain">${sol.steps.map((x) => `<span>${esc(TL(x))}</span>`).join('<i>→</i>')}</div>
-      <div class="sol__foot"><div class="sol__sum">${sum ? `<small>${t('sol.sum')}</small><b>${N(sum)} ₴</b>${partial ? `<small>${t('sol.plus')}</small>` : ''}` : `<b style="font-size:16px">${t('sol.sumReq')}</b>`}</div><span class="dir__go" style="position:static">${icon('arrowUR', 18)}</span></div>
-    </a>`;
-  }
-  function flowline(sol, bySlug, mult = 1) {
-    const { sum, partial } = solTotal(sol, bySlug, mult);
-    const rows = sol.items.map(([slug, q]) => {
-      const it = bySlug.get(slug); if (!it) return '';
-      const qty = slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q;
-      return `<a class="flowline__item" href="${itemUrl(it)}"><div class="flowline__img">${imgOrArt(it)}</div><div><h4>${esc(L(it, 'title'))}</h4><small>${esc(catName(it.category))}</small></div><div class="flowline__q"><b>${esc(priceText(it))}</b>× ${qty}</div></a>`;
-    }).join('');
-    return `<div class="flowline" style="--c:${sol.color}">${rows}
-      <div class="flowline__total"><div><small style="color:var(--muted)">${t('sol.sum')}</small><div class="price">${sum ? `${N(sum)} ₴` : t('sol.sumReq')}</div>${partial ? `<small style="color:var(--muted)">${t('sol.plus')}</small>` : ''}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn--acc btn--sm" data-solask="${sol.id}" data-mult="${mult}">${t('sol.ask')} ${icon('arrow', 16)}</button><button type="button" class="btn btn--sm" data-soladd="${sol.id}" data-mult="${mult}">${icon('clip', 16)} ${t('sol.addAll')}</button></div></div>
-    </div>`;
-  }
-  function bindSolButtons(root, bySlug) {
-    const itemsOf = (id, mult) => {
-      const sol = SOLS.find((x) => x.id === id);
-      return sol.items.map(([slug, q]) => { const it = bySlug.get(slug); return it && { it, qty: slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q }; }).filter(Boolean);
-    };
-    root.addEventListener('click', (e) => {
-      const ask = e.target.closest('[data-solask]'); const add = e.target.closest('[data-soladd]');
-      if (ask) {
-        const sol = SOLS.find((x) => x.id === ask.dataset.solask);
-        openRequestModal({ type: 'equipment', solution: TL(sol.title), itemsList: itemsOf(sol.id, Number(ask.dataset.mult) || 1) });
-      }
-      if (add) {
-        for (const { it, qty } of itemsOf(add.dataset.soladd, Number(add.dataset.mult) || 1)) { if (!basket.has(it.id)) basket.add(it, qty, 'buy'); }
-        toast(`${icon('check', 18)} ${t('sol.added')} · <a href="/request">${t('bk.open')}</a>`);
-      }
-    });
-  }
-
-  async function pageSolutions() {
-    setTitle(`${t('sol.pageTitle')} — ${S().brand}`, t('sol.pageLead'));
-    const bySlug = await allBySlug();
-    const mats = window.BH_MATERIALS || [];
-    app.innerHTML = `
-      <section class="page-head"><div class="grid-bg"></div><div class="wrap" style="position:relative">
-        <div class="crumbs"><a href="/">${t('nav.home')}</a><span>${t('nav.solutions')}</span></div>
-        <h1>${t('sol.pageTitle')}</h1><p class="lead">${t('sol.pageLead')}</p>
-        <div class="chain" style="margin-top:26px;gap:8px">${SOLS.map((x) => `<a class="chip" href="#${x.id}" style="--c:${x.color}"><span class="dot" style="color:${x.color}"></span>${esc(TL(x.title))}</a>`).join('')}</div>
-      </div></section>
-      <section class="sec--tight" style="padding-top:clamp(32px,5vw,56px)"><div class="wrap">
-        <div class="cfg reveal" id="cfg">
-          <div><div class="eyebrow">${t('cfg.eyebrow')}</div><h2 style="font-size:clamp(28px,3.4vw,44px)">${t('cfg.title')}</h2></div>
-          <div><p class="cfg__h" style="margin-bottom:12px">${t('cfg.s1')}</p><div class="cfg__mats">${mats.map((m, i) => `<button type="button" class="cfg__mat ${i ? '' : 'on'}" data-mat="${m.id}"><span>${icon(m.icon, 22)}</span><span>${esc(TL(m.t))}</span></button>`).join('')}</div></div>
-          <div><p class="cfg__h" style="margin-bottom:12px">${t('cfg.s2')}</p><div class="seg" role="group">${[1, 2, 3].map((v) => `<button type="button" data-scale="${v}" class="${v === 1 ? 'on' : ''}">${t(`cfg.v${v}`)}</button>`).join('')}</div></div>
-          <div id="cfgOut"></div>
-        </div>
-      </div></section>
-      <div class="wrap">${SOLS.map((x, i) => `<section class="solx" id="${x.id}" style="--c:${x.color}">
-        <div class="reveal">
-          <div class="solx__n">0${i + 1} / ${t('sol.eyebrow')}</div>
-          <h2>${esc(TL(x.title))}</h2>
-          <p class="solx__lead">${esc(TL(x.lead))}</p>
-          <div class="chain" style="margin-top:20px;--c:${x.color}">${x.steps.map((st) => `<span>${esc(TL(st))}</span>`).join('<i>→</i>')}</div>
-          <div class="solx__perks">${x.perks.map((pk) => `<div>${icon('check', 18, 2.2)}${esc(TL(pk))}</div>`).join('')}</div>
-          <p class="cfg__h" style="margin-bottom:10px">${t('sol.who')}</p>
-          <div class="solx__who">${x.who.map((w) => `<span class="chip">${esc(TL(w))}</span>`).join('')}</div>
-          ${x.makes.length ? `<p class="cfg__h" style="margin:22px 0 10px">${t('sol.makes')}</p><div class="solx__makes">${x.makes.map((sl) => bySlug.get(sl)).filter(Boolean).map((m) => `<a class="chip chip--acc" href="${itemUrl(m)}">${esc(L(m, 'title'))} ↗</a>`).join('')}</div>` : ''}
-          ${x.alt && bySlug.get(x.alt) ? `<p class="cfg__h" style="margin:22px 0 10px">${t('sol.alt')}</p><a class="link" href="${itemUrl(bySlug.get(x.alt))}">${esc(L(bySlug.get(x.alt), 'title'))} ↗</a>` : ''}
-        </div>
-        <div class="reveal"><p class="cfg__h" style="margin-bottom:12px">${t('sol.includes')}</p>${flowline(x, bySlug)}</div>
-      </section>`).join('')}</div>
-      ${ctaBlock()}`;
-    let mat = mats[0]?.id, scale = 1;
-    const drawCfg = () => {
-      const m = mats.find((x) => x.id === mat); const sol = SOLS.find((x) => x.id === m.sol);
-      const plastic = ['caps', 'pet'].includes(mat);
-      $('#cfgOut').innerHTML = `<div class="cfg__out" style="--c:${sol.color}">
-        <p class="cfg__h" style="margin-bottom:12px">${t('cfg.result')}: <span style="color:${sol.color}">${esc(TL(sol.title))}</span></p>
-        <div class="chain" style="margin-bottom:16px">${sol.steps.map((st) => `<span>${esc(TL(st))}</span>`).join('<i>→</i>')}</div>
-        ${flowline(sol, bySlug, plastic ? scale : 1)}
-        <p class="calc__hint" style="margin-top:12px">${scale > 1 ? `${t('cfg.scaleNote')} ` : ''}${t('cfg.note')} <a class="link" href="#${sol.id}">${t('sol.more')} ↓</a></p>
-      </div>`;
-    };
-    $$('[data-mat]').forEach((b) => b.addEventListener('click', () => { mat = b.dataset.mat; $$('[data-mat]').forEach((x) => x.classList.toggle('on', x === b)); drawCfg(); }));
-    $$('[data-scale]').forEach((b) => b.addEventListener('click', () => { scale = Number(b.dataset.scale); $$('[data-scale]').forEach((x) => x.classList.toggle('on', x === b)); drawCfg(); }));
-    drawCfg();
-    bindSolButtons(app, bySlug);
   }
   function words(parts) {
     let i = 0;
@@ -770,7 +613,12 @@
       if (sort === 'price_asc') list = [...list].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
       if (sort === 'price_desc') list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
       if (sort === 'new') list = [...list].sort((a, b) => b.id - a.id);
-      $('#grid').innerHTML = list.length ? `<div class="cards stagger in">${list.map(card).join('')}</div>`
+      const own = list.filter((x) => (x.origin || 'own') === 'own');
+      const other = list.filter((x) => (x.origin || 'own') !== 'own');
+      const grid = (arr) => `<div class="cards">${arr.map(card).join('')}</div>`;
+      $('#grid').innerHTML = list.length ? (other.length && own.length
+        ? `<h2 class="cat-h">${t('origin.ownH')}</h2><p class="cat-p">${t('origin.ownP')}</p>${grid(own)}<h2 class="cat-h" style="margin-top:56px">${t('origin.otherH')}</h2><p class="cat-p">${t('origin.otherP')}</p>${grid(other)}`
+        : grid(list))
         : `<div class="empty"><h3>${t('empty.title')}</h3><p>${t('empty.text')}</p><p style="margin-top:16px"><a class="btn btn--acc btn--sm" href="/contacts?topic=custom#form">${t('empty.cta')}</a></p></div>`;
       const u = new URLSearchParams(); if (cat) u.set('cat', cat); if (search) u.set('q', search); if (sort) u.set('sort', sort);
       history.replaceState(null, '', `${location.pathname}${u.toString() ? `?${u}` : ''}`);
@@ -800,10 +648,8 @@
     if (it.custom) fmts.push(t('item.fmtCustom'));
     const desc = L(it, 'description');
     const ex = it.extra || {};
-    const bySlug = await allBySlug();
-    const sols = SOLS.filter((x) => x.items.some(([sl]) => sl === it.slug) || x.makes.includes(it.slug) || x.alt === it.slug);
     const secs = [['overview', 'it.overview'], ex.how?.length && ['how', 'it.how'], ex.uses?.length && ['uses', 'it.uses'], ex.makes?.length && ['makes', 'it.makes'],
-      sols.length && ['solutions', 'nav.solutions'], ['specs', 'it.specs'], ex.faq?.length && ['faq', 'it.faq']].filter(Boolean);
+      ['specs', 'it.specs'], ex.faq?.length && ['faq', 'it.faq']].filter(Boolean);
     app.innerHTML = `
       <section class="ihero"><div class="wrap">
         <div class="crumbs" style="margin:28px 0 0"><a href="/">${t('nav.home')}</a><a href="/${kindPath(it.kind)}"><span>${t(kindKey)}</span></a><a href="/${kindPath(it.kind)}?cat=${it.category}"><span>${esc(catName(it.category))}</span></a></div>
@@ -828,7 +674,7 @@
                 <div><small>${t('item.avail')}</small><b>${t(`badge.${it.availability}`)}</b></div>
                 <div><small>${t('item.lead')}</small><b>${esc(it.lead_time || '—')}</b></div>
                 ${fmts.length ? `<div><small>${t('item.formats')}</small><b>${fmts.join(' · ')}</b></div>` : ''}
-                ${it.unit ? `<div><small>${t('item.unit')}</small><b>${esc(it.unit)}</b></div>` : ''}
+                <div><small>${t('origin.label')}</small><b>${originText(it)}</b></div>
               </div>
               <div class="buy__actions">
                 <button type="button" class="btn btn--acc" id="orderBtn">${t('item.order')} ${icon('arrow', 18)}</button>
@@ -850,7 +696,7 @@
 
       <section class="isec" id="overview"><div class="wrap">
         ${ex.tagline ? `<p class="itag reveal">${esc(ex.tagline)}</p>` : ''}
-        ${it.kind !== 'service' ? `<div class="included" style="margin-top:32px">${[['chart', 1], ['truck', 2], ['book', 3], ['wrench', 4]].map(([ic, i]) => `<div class="spot">${icon(ic, 22)}<p><b>${t(`inc.${i}t`)}</b><span>${t(`inc.${i}p`)}</span></p></div>`).join('')}</div>` : ''}
+        ${it.kind !== 'service' ? `<div class="included" style="margin-top:32px">${[['chart', 1], ['truck', 2], ['book', 3], ...((it.origin || 'own') === 'own' ? [['wrench', 4]] : [])].map(([ic, i]) => `<div class="spot">${icon(ic, 22)}<p><b>${t(`inc.${i}t`)}</b><span>${t(`inc.${i}p`)}</span></p></div>`).join('')}</div>` : ''}
       </div></section>
 
       ${ex.how?.length ? `<section class="isec" id="how"><div class="wrap">
@@ -865,12 +711,7 @@
 
       ${ex.makes?.length ? `<section class="isec" id="makes"><div class="wrap">
         <div class="eyebrow">${t('it.makes')}</div><h2>${t('it.makes')}</h2>
-        <div class="makes stagger">${ex.makes.map((m, i) => `<span class="make" style="--c:${CAP_COLORS[i % CAP_COLORS.length]}"><i></i>${esc(m)}</span>`).join('')}</div>
-      </div></section>` : ''}
-
-      ${sols.length ? `<section class="isec" id="solutions" style="background:var(--bg-2)"><div class="wrap">
-        <div class="eyebrow">${t('sol.eyebrow')}</div><h2>${t('it.inSol')}</h2><p class="lead" style="margin:-12px 0 28px">${t('it.inSolLead')}</p>
-        <div class="isol stagger">${sols.map((s) => solCard(s, bySlug)).join('')}</div>
+        <ul class="kit">${ex.makes.map((m) => `<li>${icon('arrow', 18)}${esc(m)}</li>`).join('')}</ul>
       </div></section>` : ''}
 
       <section class="isec" id="specs"><div class="wrap ispecs">
@@ -916,7 +757,6 @@
     $('#orderBtn2').addEventListener('click', () => open(''));
     $('#orderBtn3').addEventListener('click', () => open(''));
     $('#askBtn')?.addEventListener('click', () => openRequestModal({ type: it.kind === 'equipment' ? 'equipment' : type, item: it, mode: 'consult' }));
-    bindSolButtons(app, bySlug);
     const how = $('.how');
     if (how && 'IntersectionObserver' in window) { const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { how.classList.add('in'); io.disconnect(); } }, { threshold: .4 }); io.observe(how); }
     // підсвічування пункту підменю за прокруткою
@@ -1093,7 +933,7 @@
           <div><b class="mono">${(META.counts.equipment || 0) + (META.counts.product || 0)}</b><span>${t('ab.n1')}</span></div>
           <div><b class="mono">4</b><span>${t('ab.n2')}</span></div>
           <div><b class="mono">4</b><span>${t('ab.n3')}</span></div>
-          <div><b class="mono">100%</b><span>${t('ab.n4')}</span></div>
+          <div><b class="mono">ЧПУ</b><span>${t('ab.n4')}</span></div>
         </div>
       </div></section>
       <section class="sec"><div class="wrap">

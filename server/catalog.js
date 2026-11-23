@@ -15,11 +15,9 @@ const CATEGORIES = [
   // ── Обладнання
   { slug: 'plastic', kind: 'equipment', icon: 'shredder', uk: 'Переробка пластику', ru: 'Переработка пластика', en: 'Plastic recycling' },
   { slug: 'foundry', kind: 'equipment', icon: 'flame', uk: 'Лиття та плавлення', ru: 'Литьё и плавка', en: 'Casting & melting' },
-  { slug: 'biomass', kind: 'equipment', icon: 'pellet', uk: 'Пелети та біопаливо', ru: 'Пеллеты и биотопливо', en: 'Pellets & biofuel' },
   { slug: 'containers', kind: 'equipment', icon: 'container', uk: 'Контейнери та модулі', ru: 'Контейнеры и модули', en: 'Containers & modules' },
   { slug: 'agro', kind: 'equipment', icon: 'leaf', uk: 'Агро та фітосвітло', ru: 'Агро и фитосвет', en: 'Agro & grow lights' },
   { slug: 'heating', kind: 'equipment', icon: 'heat', uk: 'Обігрів', ru: 'Обогрев', en: 'Heating' },
-  { slug: 'business', kind: 'equipment', icon: 'factory', uk: 'Готові виробництва', ru: 'Готовые производства', en: 'Turnkey businesses' },
   { slug: 'other-eq', kind: 'equipment', icon: 'gear', uk: 'Інше обладнання', ru: 'Другое оборудование', en: 'Other equipment' },
   // ── Вироби
   { slug: 'caps', kind: 'product', icon: 'caps', uk: 'З кришечок і пластику', ru: 'Из крышечек и пластика', en: 'From caps & plastic' },
@@ -55,6 +53,8 @@ const REQUEST_STATUSES = {
 };
 
 const PRICE_TYPES = ['fixed', 'from', 'request'];
+// Походження позиції: own — власне виробництво БХ, order — збираємо під замовлення, supply — постачаємо (не власне виробництво).
+const ORIGINS = ['own', 'order', 'supply'];
 const AVAILABILITY = ['stock', 'order', 'preorder'];
 
-module.exports = { KINDS, CATEGORIES, REQUEST_TYPES, REQUEST_STATUSES, PRICE_TYPES, AVAILABILITY };
+module.exports = { KINDS, CATEGORIES, REQUEST_TYPES, REQUEST_STATUSES, PRICE_TYPES, AVAILABILITY, ORIGINS };

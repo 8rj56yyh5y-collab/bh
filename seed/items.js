@@ -11,7 +11,7 @@ const P = (id, name) => `https://images.prom.ua/${id}_w1280_h640_${name}.jpg`;
 module.exports = [
   // ═══════════════════════════ ОБЛАДНАННЯ ═══════════════════════════
   {
-    slug: 'drobarka-dlya-plastyku-1-5-kvt',
+    slug: 'drobarka-dlya-plastyku-1-5-kvt', origin: 'own',
     kind: 'equipment', category: 'plastic', featured: 1, sort: 10,
     title: 'Дробарка для пластику 1,5 кВт',
     title_ru: 'Дробилка для пластика 1,5 кВт',
@@ -40,7 +40,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3123996072-drobarka-dlya-plastika.html',
   },
   {
-    slug: 'shnekovyi-ekstruder-dlya-plastyku',
+    slug: 'shnekovyi-ekstruder-dlya-plastyku', origin: 'own',
     kind: 'equipment', category: 'plastic', featured: 1, sort: 20,
     title: 'Шнековий екструдер для переробки пластику',
     title_ru: 'Шнековый экструдер для переработки пластика',
@@ -48,7 +48,7 @@ module.exports = [
     summary: 'Плавить флекс або гранулу та формує пруток — філамент для 3D-принтерів чи заготовку для виробів.',
     summary_ru: 'Плавит флекс или гранулу и формирует пруток — филамент для 3D-принтеров или заготовку для изделий.',
     summary_en: 'Melts flakes or pellets into a continuous strand — 3D-printer filament or stock for products.',
-    description: `Шнековий екструдер для виготовлення філаменту для 3D-принтерів і переробки пластикової гранули або подрібненої сировини. Разом із нашою дробаркою утворює мінімальну лінію «відходи → готовий матеріал».
+    description: `Шнековий екструдер для виготовлення філаменту для 3D-принтерів і переробки пластикової гранули або подрібненої сировини.
 
 Комплектація:
 • мотор DriveMotors 0,09 кВт;
@@ -67,33 +67,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3176327742-ekstruder-dlya-pererabotki.html',
   },
   {
-    slug: 'liniya-vyrobnytstva-pelet-1-t-god',
-    kind: 'equipment', category: 'biomass', featured: 1, sort: 30,
-    title: 'Лінія виробництва пелет 1 т/год',
-    title_ru: 'Линия производства пеллет 1 т/ч',
-    title_en: 'Pellet production line 1 t/h',
-    summary: 'Повний комплекс: два італійські преси BOLARETTO, два млини, бункер, подача та фасовка.',
-    summary_ru: 'Полный комплекс: два итальянских пресса BOLARETTO, две мельницы, бункер, подача и фасовка.',
-    summary_en: 'Complete set: two Italian BOLARETTO presses, two mills, hopper, feeding and bagging.',
-    description: `Готова лінія для виробництва паливних пелет із тирси та деревних відходів.
-
-Склад лінії:
-• 2 преси BOLARETTO (Італія) по 500 кг/год — разом 1 т/год;
-• 2 млини для підготовки сировини;
-• бункер;
-• система подачі;
-• фасовка.
-
-Допоможемо з демонтажем, перевезенням, монтажем і запуском на вашому майданчику.`,
-    specs: [['Преси', '2 × BOLARETTO (Італія)'], ['Продуктивність', '2 × 500 кг/год = 1 т/год'], ['Млини', '2 шт.'], ['Бункер', 'так'], ['Подача сировини', 'так'], ['Фасовка', 'так'], ['Сировина', 'тирса, деревні відходи']],
-    highlights: [['1 т/год', 'продуктивність'], ['2 преси', 'BOLARETTO, Італія'], ['під ключ', 'млини, подача, фасовка']],
-    price: 2685000, price_type: 'fixed',
-    availability: 'stock', lead_time: 'в наявності', rent: 0, custom: 0,
-    images: [P('6520184250', 'oborudovanie-po-proizvodstvu'), P('6520184132', 'oborudovanie-po-proizvodstvu'), P('6520184169', 'oborudovanie-po-proizvodstvu'), P('6520184141', 'oborudovanie-po-proizvodstvu'), P('6520184126', 'oborudovanie-po-proizvodstvu')],
-    source_url: 'https://prom.ua/ua/p2520232862-oborudovanie-proizvodstvu-pellet.html',
-  },
-  {
-    slug: 'elektrychnyi-tyhel-dlya-plavlennya',
+    slug: 'elektrychnyi-tyhel-dlya-plavlennya', origin: 'own',
     kind: 'equipment', category: 'foundry', featured: 1, sort: 40,
     title: 'Електричний тигель для плавлення',
     title_ru: 'Электрический тигель для плавки',
@@ -108,9 +82,7 @@ module.exports = [
 Особливості:
 • надійний металевий корпус;
 • стійка підставка для безпечної роботи на верстаті;
-• електронне керування температурою.
-
-Добре працює в парі з нашими фрезерованими формами для лиття.`,
+• електронне керування температурою.`,
     specs: [['Призначення', 'плавлення свинцю та м’яких металів'], ['Керування', 'електронне, точне'], ['Корпус', 'металевий'], ['Встановлення', 'на верстат, стійка підставка']],
     highlights: [['Pb · Sn', 'м’які метали'], ['електронне', 'керування']],
     price: 10000, price_type: 'fixed',
@@ -119,7 +91,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3136138912-elektricheskij-tigel-dlya.html',
   },
   {
-    slug: 'forma-dlya-lyttya-hryppa-100-g',
+    slug: 'forma-dlya-lyttya-hryppa-100-g', origin: 'own',
     kind: 'equipment', category: 'foundry', sort: 50,
     title: 'Форма для лиття грузила «Гриппа» 100 г',
     title_ru: 'Форма для литья грузила «Гриппа» 100 г',
@@ -140,7 +112,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3176314750-forma-dlya-litya.html',
   },
   {
-    slug: 'forma-dlya-lyttya-kraplya-100-g',
+    slug: 'forma-dlya-lyttya-kraplya-100-g', origin: 'own',
     kind: 'equipment', category: 'foundry', sort: 51,
     title: 'Форма для лиття грузила «Крапля» з вушком 100 г',
     title_ru: 'Форма для литья грузила «Капля» с ушком 100 г',
@@ -164,7 +136,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3199435686-forma-dlya-litya.html',
   },
   {
-    slug: 'forma-dlya-lyttya-kraplya-200-g',
+    slug: 'forma-dlya-lyttya-kraplya-200-g', origin: 'own',
     kind: 'equipment', category: 'foundry', sort: 52,
     title: 'Форма для лиття грузила «Крапля» з вушком 200 г',
     title_ru: 'Форма для литья грузила «Капля» с ушком 200 г',
@@ -188,7 +160,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3199438290-forma-dlya-litya.html',
   },
   {
-    slug: 'kontejner-dlya-multylifta-scania',
+    slug: 'kontejner-dlya-multylifta-scania', origin: 'own',
     kind: 'equipment', category: 'containers', featured: 1, sort: 60,
     title: 'Контейнер для мультиліфта Scania 5,1 × 2,65 × 2,1 м',
     title_ru: 'Контейнер для мультилифта Scania 5,1 × 2,65 × 2,1 м',
@@ -196,7 +168,7 @@ module.exports = [
     summary: 'Новий відкритий кузов з посиленим каркасом для спецтехніки з мультиліфтом — металобрухт, будівельні відходи, сипучі матеріали.',
     summary_ru: 'Новый открытый кузов с усиленным каркасом для спецтехники с мультилифтом — металлолом, строительные отходы, сыпучие материалы.',
     summary_en: 'New open-top body with reinforced frame for hook-lift trucks — scrap metal, construction waste, bulk materials.',
-    description: `Металевий контейнер для автомобіля Scania з системою мультиліфт. Виготовлений у нашому цеху — саме такі контейнери працюють у нас на вивезенні металобрухту.
+    description: `Металевий контейнер для автомобіля Scania з системою мультиліфт.
 
 Новий кузов відкритого типу з міцною металевою конструкцією та посиленим каркасом, задні двостулкові ворота.
 
@@ -209,7 +181,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3134277331-metallicheskij-kontejner-dlya.html',
   },
   {
-    slug: 'modulnyi-zbirno-rozbirnyi-kontejner-pir-100',
+    slug: 'modulnyi-zbirno-rozbirnyi-kontejner-pir-100', origin: 'order',
     kind: 'equipment', category: 'containers', featured: 1, sort: 70,
     title: 'Модульний збірно-розбірний контейнер 6,05 × 2,44 м, PIR 100 мм',
     title_ru: 'Модульный сборно-разборный контейнер 6,05 × 2,44 м, PIR 100 мм',
@@ -217,7 +189,9 @@ module.exports = [
     summary: 'Утеплений модуль для побутівки, офісу, поста охорони чи майстерні. Складається до 0,54 м заввишки для перевезення.',
     summary_ru: 'Утеплённый модуль для бытовки, офиса, поста охраны или мастерской. Складывается до 0,54 м в высоту для перевозки.',
     summary_en: 'Insulated module for site cabins, offices, guard posts or workshops. Folds down to 0.54 m for transport.',
-    description: `Збірно-розбірний модуль на болтовому каркасі з тришарових сендвіч-панелей із PIR-утепленням 100 мм. Готовий до використання: вікна, двері, електрика й освітлення вже змонтовані.
+    description: `Збираємо під замовлення під вашу задачу: планування, кількість вікон і дверей, оздоблення, електрика.
+
+Збірно-розбірний модуль на болтовому каркасі з тришарових сендвіч-панелей із PIR-утепленням 100 мм. Готовий до використання: вікна, двері, електрика й освітлення вже змонтовані.
 
 Каркас:
 • металеві профілі товщиною 2–4 мм;
@@ -257,7 +231,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3176132761-modulnyj-sborno-razbornyj.html',
   },
   {
-    slug: 'komplekt-led-fitolamp-1600-vt',
+    slug: 'komplekt-led-fitolamp-1600-vt', origin: 'supply',
     kind: 'equipment', category: 'agro', sort: 80,
     title: 'Комплект LED-фітоламп 56 × 2 м, 1600 Вт',
     title_ru: 'Комплект LED-фитоламп 56 × 2 м, 1600 Вт',
@@ -269,7 +243,7 @@ module.exports = [
 
 Розрахований на освітлення зони площею до 12,8 м²: 56 світильників довжиною 2 м загальною потужністю 1600 Вт.
 
-Підходить для багаторівневих стелажів, теплиць, ферм і приміщень для вирощування рослин. Продається повним комплектом разом із блоками живлення. Стелажі під лампи можемо виготовити в нашому цеху.`,
+Підходить для багаторівневих стелажів, теплиць, ферм і приміщень для вирощування рослин. Продається повним комплектом разом із блоками живлення.`,
     specs: [['Кількість світильників', '56 шт.'], ['Довжина світильника', '2 м'], ['Загальна потужність', '1600 Вт'], ['Площа освітлення', 'до 12,8 м²'], ['Тип', 'LED'], ['Блоки живлення', 'в комплекті'], ['Призначення', 'салат, зелень, розсада']],
     highlights: [['12,8 м²', 'площа'], ['1600 Вт', 'потужність'], ['56 шт.', 'світильників']],
     price: 16000, price_type: 'fixed',
@@ -278,7 +252,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3250514911-komplekt-led-fitolamp.html',
   },
   {
-    slug: 'pich-burzhuika-z-dymokhodom',
+    slug: 'pich-burzhuika-z-dymokhodom', origin: 'own',
     kind: 'equipment', category: 'heating', sort: 90,
     title: 'Піч-буржуйка з димоходом',
     title_ru: 'Печь-буржуйка с дымоходом',
@@ -286,7 +260,7 @@ module.exports = [
     summary: 'Компактна вертикальна піч для гаража, майстерні, дачі чи господарського приміщення.',
     summary_ru: 'Компактная вертикальная печь для гаража, мастерской, дачи или хозяйственного помещения.',
     summary_en: 'Compact upright stove for garages, workshops, cottages and utility rooms.',
-    description: `Металева піч-буржуйка з димоходом — просте й надійне рішення для обігріву гаража, майстерні, дачі чи господарського приміщення. Зварена в нашому цеху з металу, що отримав друге життя.
+    description: `Металева піч-буржуйка з димоходом — просте й надійне рішення для обігріву гаража, майстерні, дачі чи господарського приміщення.
 
 Особливості:
 • міцна металева конструкція;
@@ -302,39 +276,12 @@ module.exports = [
     images: [P('7726064921', 'burzhujka'), P('7726068140', 'burzhujka'), P('6605990182', 'burzhujka'), P('6605990186', 'burzhujka'), P('6605990188', 'burzhujka')],
     source_url: 'https://prom.ua/ua/p2575702183-burzhujka.html',
   },
-  {
-    slug: 'derevoobrobne-pidpryiemstvo-karpaty',
-    kind: 'equipment', category: 'business', sort: 200,
-    title: 'Деревообробне підприємство «Карпати» з лінією пелет',
-    title_ru: 'Деревообрабатывающее предприятие «Карпаты» с линией пеллет',
-    title_en: '“Karpaty” wood-processing plant with pellet line',
-    summary: '2 га землі біля траси на Румунію, пилорами, козловий кран, цехи та італійська лінія пелет.',
-    summary_ru: '2 га земли у трассы на Румынию, пилорамы, козловой кран, цеха и итальянская линия пеллет.',
-    summary_en: '2 ha of land by the road to Romania, sawmills, gantry crane, workshops and an Italian pellet line.',
-    description: `Об’єкт розташований у с. Барвина, Верховинський район, Івано-Франківська область.
-
-До складу входить:
-• 2 гектари землі поруч із дорогою на Румунію;
-• пилорами для перероблення деревини;
-• козловий кран для вантажно-розвантажувальних робіт;
-• дерев’яні цехи, готові до використання;
-• лінія виробництва пелет із двома пресами італійського виробництва;
-• дві машини для доставляння тирси.
-
-Готовий об’єкт для бізнесу з перероблення деревини та виробництва пелет. Вартість — 500 000 $, умови обговорюються індивідуально.`,
-    specs: [['Земля', '2 га'], ['Розташування', 'Верховинський р-н, Івано-Франківська обл.'], ['Обладнання', 'пилорами, козловий кран, лінія пелет'], ['Будівлі', 'дерев’яні цехи'], ['Транспорт', '2 машини для тирси'], ['Вартість', '500 000 $']],
-    highlights: [['2 га', 'земля'], ['500 000 $', 'вартість'], ['під ключ', 'діюче виробництво']],
-    price: null, price_type: 'request', price_note: '500 000 $',
-    availability: 'stock', lead_time: '', rent: 0, custom: 0,
-    images: [P('5885262508', 'pp-karpati'), P('5885262626', 'pp-karpati'), P('5885262499', 'pp-karpati'), P('5885262498', 'pp-karpati'), P('5885262046', 'pp-karpati')],
-    source_url: 'https://prom.ua/ua/p2229570201-karpati.html',
-  },
 
   // ═══════════════════════════ ВИРОБИ З ВТОРСИРОВИНИ ═══════════════════════════
   // Вироби з кришечок — під замовлення, ціна за розрахунком. Фото замінюються в адмінці;
   // поки фото немає, сайт малює ілюстрацію «пластик із кришечок».
   {
-    slug: 'lavka-z-pereroblenoho-plastyku',
+    slug: 'lavka-z-pereroblenoho-plastyku', origin: 'own',
     kind: 'product', category: 'caps', featured: 1, sort: 10,
     title: 'Лавка з переробленого пластику',
     title_ru: 'Скамейка из переработанного пластика',
@@ -362,7 +309,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'plastykovyi-brus-ta-doshka',
+    slug: 'plastykovyi-brus-ta-doshka', origin: 'own',
     kind: 'product', category: 'caps', featured: 1, sort: 20,
     title: 'Пластиковий брус і дошка з кришечок',
     title_ru: 'Пластиковый брус и доска из крышечек',
@@ -389,7 +336,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'urna-ta-smittievyi-bak',
+    slug: 'urna-ta-smittievyi-bak', origin: 'own',
     kind: 'product', category: 'caps', featured: 1, sort: 30,
     title: 'Урна та бак для сортування відходів',
     title_ru: 'Урна и бак для сортировки отходов',
@@ -412,7 +359,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'bordiur-dlya-klumb-i-hryadok',
+    slug: 'bordiur-dlya-klumb-i-hryadok', origin: 'own',
     kind: 'product', category: 'caps', sort: 40,
     title: 'Бордюр для клумб і високих грядок',
     title_ru: 'Бордюр для клумб и высоких грядок',
@@ -435,7 +382,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'stil-i-lavky-komplekt',
+    slug: 'stil-i-lavky-komplekt', origin: 'own',
     kind: 'product', category: 'caps', sort: 50,
     title: 'Комплект «стіл + 2 лавки» для подвір’я',
     title_ru: 'Комплект «стол + 2 скамейки» для двора',
@@ -453,7 +400,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'lysty-i-paneli-z-plastyku',
+    slug: 'lysty-i-paneli-z-plastyku', origin: 'own',
     kind: 'product', category: 'caps', sort: 60,
     title: 'Листи та панелі «терраццо» з кришечок',
     title_ru: 'Листы и панели «терраццо» из крышечек',
@@ -477,7 +424,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'trotuarna-plytka',
+    slug: 'trotuarna-plytka', origin: 'own',
     kind: 'product', category: 'concrete', sort: 70,
     title: 'Тротуарна плитка «Камінь», «Мозаїка», «Квітка»',
     title_ru: 'Тротуарная плитка «Камень», «Мозаика», «Цветок»',
@@ -506,7 +453,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3226111556-tratuarna-plitka.html',
   },
   {
-    slug: 'manhal-hryl-ruchnoi-roboty',
+    slug: 'manhal-hryl-ruchnoi-roboty', origin: 'own',
     kind: 'product', category: 'metal', sort: 80,
     title: 'Мангал-гриль ручної роботи',
     title_ru: 'Мангал-гриль ручной работы',
@@ -530,7 +477,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p2575709130-mangal-gril-ruchnoj.html',
   },
   {
-    slug: 'sklyanky-z-plyashok',
+    slug: 'sklyanky-z-plyashok', origin: 'own',
     kind: 'product', category: 'glass', sort: 90,
     title: 'Склянки з пляшок',
     title_ru: 'Стаканы из бутылок',
@@ -555,7 +502,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'vazy-ta-posud-zi-skla',
+    slug: 'vazy-ta-posud-zi-skla', origin: 'own',
     kind: 'product', category: 'glass', sort: 100,
     title: 'Вази та тарілки зі скляних пляшок',
     title_ru: 'Вазы и тарелки из стеклянных бутылок',
@@ -578,7 +525,7 @@ module.exports = [
 
   // ═══════════════════════════ ПОСЛУГИ ЦЕХУ ═══════════════════════════
   {
-    slug: 'obladnannya-pid-zamovlennya',
+    slug: 'obladnannya-pid-zamovlennya', origin: 'own',
     kind: 'service', category: 'engineering', featured: 1, sort: 5,
     title: 'Обладнання під вашу задачу',
     title_ru: 'Оборудование под вашу задачу',
@@ -607,7 +554,7 @@ module.exports = [
     images: [],
   },
   {
-    slug: 'plazmova-rizka-metalu-chpu',
+    slug: 'plazmova-rizka-metalu-chpu', origin: 'own',
     kind: 'service', category: 'cnc', featured: 1, sort: 10,
     title: 'Плазмова різка металу на ЧПУ',
     title_ru: 'Плазменная резка металла на ЧПУ',
@@ -637,7 +584,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3244316971-plazmennaya-rozga-metalla.html',
   },
   {
-    slug: 'frezerna-obrobka-chpu',
+    slug: 'frezerna-obrobka-chpu', origin: 'own',
     kind: 'service', category: 'cnc', sort: 20,
     title: 'Фрезерна обробка на ЧПУ',
     title_ru: 'Фрезерная обработка на ЧПУ',
@@ -664,7 +611,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3244353211-frezernaya-otdelka-chpu.html',
   },
   {
-    slug: 'lazerne-hraviyuvannya-chpu',
+    slug: 'lazerne-hraviyuvannya-chpu', origin: 'own',
     kind: 'service', category: 'cnc', sort: 30,
     title: 'Лазерне гравіювання на ЧПУ',
     title_ru: 'Лазерная гравировка на ЧПУ',
@@ -690,7 +637,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p3244326737-chpu-lazer-gravirovka.html',
   },
   {
-    slug: '3d-druk-pid-zamovlennya',
+    slug: '3d-druk-pid-zamovlennya', origin: 'own',
     kind: 'service', category: 'print3d', sort: 40,
     title: '3D-друк під замовлення',
     title_ru: '3D-печать на заказ',
@@ -716,7 +663,7 @@ module.exports = [
     source_url: 'https://prom.ua/ua/p2380621609-uslugi-pechati-zakaz.html',
   },
   {
-    slug: 'vyroby-z-vashoi-syrovyny',
+    slug: 'vyroby-z-vashoi-syrovyny', origin: 'own',
     kind: 'service', category: 'engineering', featured: 1, sort: 50,
     title: 'Вироби з вашої сировини',
     title_ru: 'Изделия из вашего сырья',

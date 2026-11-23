@@ -6,13 +6,13 @@ const { db, UPLOAD_DIR, parseJSON } = require('./db');
 
 const ITEM_FIELDS = ['slug', 'kind', 'category', 'title', 'title_ru', 'title_en', 'summary', 'summary_ru', 'summary_en',
   'description', 'description_ru', 'description_en', 'specs', 'highlights', 'price', 'price_type', 'price_note', 'unit',
-  'availability', 'lead_time', 'rent', 'custom', 'plastic_kg', 'images', 'featured', 'published', 'sort', 'source_url', 'extra'];
+  'availability', 'lead_time', 'rent', 'custom', 'plastic_kg', 'images', 'featured', 'published', 'sort', 'source_url', 'extra', 'origin'];
 
 function insertItem(it) {
   const row = {
     title_ru: '', title_en: '', summary: '', summary_ru: '', summary_en: '', description: '', description_ru: '', description_en: '',
     specs: [], highlights: [], price: null, price_type: 'fixed', price_note: '', unit: 'шт.', availability: 'order', lead_time: '',
-    rent: 0, custom: 1, plastic_kg: null, images: [], featured: 0, published: 1, sort: 100, source_url: '', ...it,
+    rent: 0, custom: 1, plastic_kg: null, images: [], featured: 0, published: 1, sort: 100, source_url: '', origin: 'own', ...it,
   };
   row.extra = JSON.stringify(it.extra || require('../seed/extra')[it.slug] || {});
   row.specs = JSON.stringify(row.specs);
@@ -30,6 +30,7 @@ function seedIfEmpty() {
     for (const it of items) insertItem(it);
     console.log(`Каталог: завантажено ${items.length} позицій (обладнання, вироби, послуги).`);
   }
+  fixContent();
   // Розширені описи сторінок товарів: доповнюємо позиції, де їх ще немає (бази попередніх версій).
   const extra = require('../seed/extra');
   const upd = db.prepare("UPDATE items SET extra = ? WHERE slug = ? AND (extra = '{}' OR extra = '')");
@@ -41,6 +42,28 @@ function seedIfEmpty() {
     }
     db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('vacancies_seeded', '\"1\"')").run();
   }
+}
+
+// Виправлення змісту для баз попередніх версій (один раз): прибираємо позиції, що не належать БХ,
+// проставляємо походження і замінюємо описи, у яких були неточності щодо виробництва.
+const CONTENT_VERSION = 3;
+const REMOVED = ['liniya-vyrobnytstva-pelet-1-t-god', 'derevoobrobne-pidpryiemstvo-karpaty'];
+const REWRITTEN = ['shnekovyi-ekstruder-dlya-plastyku', 'elektrychnyi-tyhel-dlya-plavlennya', 'kontejner-dlya-multylifta-scania',
+  'modulnyi-zbirno-rozbirnyi-kontejner-pir-100', 'komplekt-led-fitolamp-1600-vt', 'pich-burzhuika-z-dymokhodom', 'frezerna-obrobka-chpu'];
+function fixContent() {
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'content_v'").get();
+  if (row && Number(parseJSON(row.value, 0)) >= CONTENT_VERSION) return;
+  const items = require('../seed/items');
+  const extra = require('../seed/extra');
+  const del = db.prepare('UPDATE items SET published = 0 WHERE slug = ?');
+  for (const slug of REMOVED) del.run(slug);
+  const org = db.prepare('UPDATE items SET origin = ? WHERE slug = ?');
+  const txt = db.prepare("UPDATE items SET description = ?, extra = ?, updated_at = datetime('now') WHERE slug = ?");
+  for (const it of items) {
+    org.run(it.origin || 'own', it.slug);
+    if (REWRITTEN.includes(it.slug)) txt.run(it.description, JSON.stringify(extra[it.slug] || {}), it.slug);
+  }
+  db.prepare("INSERT INTO settings (key, value) VALUES ('content_v', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(JSON.stringify(CONTENT_VERSION));
 }
 
 // Фото з Prom завантажуємо на свій диск у фоні: сайт не залежить від чужого сервера.

@@ -191,3 +191,55 @@
 .mat__eq .chip:hover { border-color: var(--acc); color: var(--text); }
 @media (max-width: 1100px) { .mats { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .mats { grid-template-columns: 1fr; } }
+
+/* ═══ Калькулятор на сторінці «Кришечки» ═══ */
+.benches { display: flex; gap: 6px; align-items: flex-end; flex-wrap: wrap; min-height: 34px; }
+.bench { width: 30px; height: 22px; position: relative; color: var(--line-2); transition: color .3s, transform .3s; }
+.bench svg { width: 100%; height: 100%; display: block; }
+.bench.on { color: var(--acc); transform: translateY(-2px); }
+.bench.part { color: color-mix(in srgb, var(--acc) 45%, var(--line-2)); }
+.benches__more { font: 700 13px var(--f-mono); color: var(--acc-text); margin-left: 4px; align-self: center; }
+.calc__val span { display: inline-block; transition: transform .15s; }
+.calc input[type=range] { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 99px; outline: none;
+  background: linear-gradient(90deg, var(--acc) var(--fill, 5%), var(--line-2) var(--fill, 5%)); }
+.calc input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--acc); border: 4px solid var(--bg-2); box-shadow: 0 0 0 1px var(--acc), 0 6px 16px rgba(198, 244, 50, .4); cursor: grab; }
+.calc input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--acc); border: 4px solid var(--bg-2); box-shadow: 0 0 0 1px var(--acc); cursor: grab; }
+.caps__art::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 80% at 70% 40%, transparent 40%, rgba(10, 14, 13, .55)); }
+.caps__big { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 1; text-align: center; padding: 22px 30px; border-radius: 22px;
+  background: rgba(10, 14, 13, .72); border: 1px solid rgba(255, 255, 255, .12); backdrop-filter: blur(14px); color: #EEF3EF; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .8); }
+.caps__big b { display: block; font: 800 clamp(40px, 5vw, 64px)/1 var(--f-display); letter-spacing: -.03em; }
+.caps__big span { font: 600 12px var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: #A9B6AF; }
+.caps__art > div[style] { z-index: 2; }
+
+/* ═══ Спокійна головна ═══ */
+.eyebrow { color: var(--muted); }
+.eyebrow::before { background: var(--acc); }
+.hero { padding: clamp(56px, 8vw, 112px) 0 clamp(56px, 7vw, 96px); }
+.hero h1 { font-size: clamp(38px, 4.8vw, 68px); }
+.hero .lead { max-width: 560px; }
+.flow { box-shadow: none; }
+.grid-bg { opacity: .6; }
+.svc-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; }
+.svc { display: grid; grid-template-columns: 48px 1fr 32px; gap: 16px; align-items: start; padding: 28px 0; border-top: 1px solid var(--line); transition: color .2s; }
+.svc__n { font-size: 13px; color: var(--muted); padding-top: 6px; }
+.svc h3 { font-size: 22px; margin-bottom: 8px; transition: color .2s; }
+.svc p { color: var(--text-2); font-size: 15.5px; max-width: 460px; }
+.svc__go { color: var(--muted); padding-top: 4px; transition: transform .2s, color .2s; }
+.svc:hover h3, .svc:hover .svc__go { color: var(--acc-text); }
+.svc:hover .svc__go { transform: translateX(4px); }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.duo__item { display: flex; flex-direction: column; gap: 12px; padding: clamp(24px, 3vw, 40px); border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--bg); transition: border-color .2s; }
+.duo__item:hover { border-color: var(--line-2); }
+.duo__item h3 { font-size: clamp(24px, 2.4vw, 32px); }
+.duo__item p { color: var(--text-2); }
+.duo__item .eyebrow { margin: 0; }
+.cat-h { font-size: clamp(24px, 2.4vw, 32px); margin-bottom: 6px; }
+.cat-p { color: var(--muted); margin-bottom: 20px; }
+.card__img .card__badges { display: none; }
+.cta { background: var(--panel); color: var(--text); border: 1px solid var(--line); }
+.cta__grid { display: none; }
+.cta p { color: var(--text-2); opacity: 1; }
+.cta .btn--dark { --b-bg: var(--acc); --b-fg: var(--acc-ink); --b-bd: var(--acc); }
+.cta .btn--ghost { --b-fg: var(--text); --b-bd: var(--line-2); }
+.story__box[data-stage] .sf-heatglow { opacity: .6; }
+@media (max-width: 860px) { .svc-list, .duo { grid-template-columns: 1fr; } }

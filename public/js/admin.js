@@ -8,6 +8,7 @@ window.BH_ADMIN = (() => {
   const KIND_UA = { equipment: 'Обладнання', product: 'Вироби', service: 'Послуги' };
   const AVAIL = { stock: 'В наявності', order: 'Виготовлення під замовлення', preorder: 'Під замовлення (виріб)' };
   const PRICE_T = { fixed: 'Фіксована', from: 'Від …', request: 'За запитом' };
+  const ORIGIN = { own: 'Власне виробництво БХ', order: 'Збираємо під замовлення', supply: 'Постачаємо (не наше виробництво)' };
   const fmtDate = (s) => { const d = new Date(s.includes('T') ? s : `${s.replace(' ', 'T')}Z`); return d.toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }); };
   const money = (n) => Number(n).toLocaleString('uk-UA').replace(/ /g, ' ');
   let root, tab = 'requests', me = {};
@@ -183,7 +184,7 @@ window.BH_ADMIN = (() => {
       const rows = all.filter((x) => x.kind === itKind && (!q || x.title.toLowerCase().includes(q)));
       $('#itList').innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th></th><th>Назва</th><th class="hide-m">Категорія</th><th>Ціна</th><th title="Показувати на сайті">Сайт</th><th class="hide-m" title="На головній / хіт">Хіт</th><th class="hide-m">Перегл.</th><th></th></tr></thead><tbody>
         ${rows.map((x) => `<tr data-id="${x.id}"><td><div class="thumb">${x.images[0] ? `<img src="${C.esc(x.images[0])}" alt="">` : C.art(x)}</div></td>
-          <td><a class="link" href="/${C.META.kinds[x.kind].path}/${x.slug}" target="_blank" style="font-weight:600;color:var(--text)">${C.esc(x.title)}</a><div class="mono" style="font-size:12px;color:var(--muted)">${x.images.length} фото · сорт. ${x.sort}${x.rent ? ' · оренда' : ''}</div></td>
+          <td><a class="link" href="/${C.META.kinds[x.kind].path}/${x.slug}" target="_blank" style="font-weight:600;color:var(--text)">${C.esc(x.title)}</a><div class="mono" style="font-size:12px;color:var(--muted)">${ORIGIN[x.origin || 'own']} · ${x.images.length} фото · сорт. ${x.sort}${x.rent ? ' · оренда' : ''}</div></td>
           <td class="hide-m">${C.esc(C.catName(x.category))}</td>
           <td class="mono" style="white-space:nowrap">${x.price_type === 'request' || x.price == null ? 'за запитом' : `${x.price_type === 'from' ? 'від ' : ''}${money(x.price)} ₴`}</td>
           <td><button type="button" class="toggle ${x.published ? 'on' : ''}" data-tg="published" aria-label="Показувати"></button></td>
@@ -204,7 +205,7 @@ window.BH_ADMIN = (() => {
     const save = async () => { all = (await C.api('/api/admin/items')).items; list(); };
     $$('[data-k]', pane).forEach((b) => b.addEventListener('click', () => { itKind = b.dataset.k; $$('[data-k]', pane).forEach((x) => x.classList.toggle('on', x === b)); list(); }));
     $('#iq').addEventListener('input', (e) => { itQ = e.target.value; list(); });
-    $('#addItem').addEventListener('click', () => editItem({ kind: itKind, images: [], specs: [], highlights: [], price_type: 'fixed', availability: 'order', unit: 'шт.', custom: 1, published: 1, sort: 100 }, save));
+    $('#addItem').addEventListener('click', () => editItem({ kind: itKind, origin: 'own', images: [], specs: [], highlights: [], price_type: 'fixed', availability: 'order', unit: 'шт.', custom: 1, published: 1, sort: 100 }, save));
     list();
   }
 
@@ -235,6 +236,7 @@ window.BH_ADMIN = (() => {
       <div class="ed-sec"><h4>Ціна і наявність</h4>
         <div class="form__row--3 form__row">${sel('price_type', 'Тип ціни', PRICE_T, x.price_type)}${f('price', 'Ціна, ₴', x.price, { type: 'number', attrs: 'min="0" step="1"' })}${f('unit', 'Одиниця', x.unit, { ph: 'шт., м², пог. м' })}</div>
         ${f('price_note', 'Примітка до ціни', x.price_note, { ph: 'напр., від 35 000 до 40 000 ₴ залежно від комплектації' })}
+        <div class="form__row">${sel('origin', 'Походження', ORIGIN, x.origin || 'own')}<span></span></div>
         <div class="form__row">${sel('availability', 'Наявність', AVAIL, x.availability)}${f('lead_time', 'Термін виготовлення', x.lead_time, { ph: 'від 14 робочих днів' })}</div>
         <div style="display:flex;gap:18px;flex-wrap:wrap">${chk('rent', 'Можна в оренду', x.rent)}${chk('custom', 'Робимо під параметри замовника', x.custom)}${chk('featured', 'Хіт / на головній', x.featured)}${chk('published', 'Показувати на сайті', x.published)}</div>
       </div>
