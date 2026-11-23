@@ -100,7 +100,8 @@ const JSON_ITEM = ['specs', 'highlights', 'images'];
 function itemOut(r, full = false) {
   const o = { ...r };
   for (const f of JSON_ITEM) o[f] = parseJSON(r[f], []);
-  if (!full) { delete o.description; delete o.description_ru; delete o.description_en; delete o.specs; delete o.source_url; }
+  o.extra = parseJSON(r.extra, {});
+  if (!full) { delete o.extra; delete o.description; delete o.description_ru; delete o.description_en; delete o.specs; delete o.source_url; }
   return o;
 }
 const LIST_COLS = 'id, slug, kind, category, title, title_ru, title_en, summary, summary_ru, summary_en, highlights, price, price_type, price_note, unit, availability, lead_time, rent, custom, plastic_kg, images, featured, sort';
@@ -133,7 +134,7 @@ function publicMeta() {
 
 // ───────────────────────── заявки
 const REQ_DETAIL_KEYS = ['mode', 'qty', 'color', 'size', 'branding', 'deadline', 'own_material', 'material', 'volume', 'output', 'budget',
-  'format', 'vacancy', 'experience', 'weight', 'pickup', 'delivery', 'install', 'service', 'product', 'org'];
+  'format', 'vacancy', 'experience', 'weight', 'pickup', 'delivery', 'install', 'service', 'product', 'org', 'solution'];
 const reqNumber = (id) => `BH-${String(id).padStart(5, '0')}`;
 
 function saveAttachments(files) {
@@ -221,6 +222,11 @@ function itemFromBody(b, existing = {}) {
   o.images = JSON.stringify((Array.isArray(b.images) ? b.images : []).slice(0, 12)
     .map((u) => str(u, 500)).filter((u) => /^\/uploads\/[a-f0-9]+\.(jpg|png|webp)$/.test(u) || /^https:\/\//.test(u)));
   o.source_url = str(b.source_url, 300);
+  // Без поля extra (старий клієнт, масові правки) — лишаємо збережену розповідь як є.
+  const ex = b.extra && typeof b.extra === 'object' ? b.extra : parseJSON(existing.extra, {});
+  const lines = (v, n, max = 300) => (Array.isArray(v) ? v : []).slice(0, n).map((x) => str(x, max)).filter(Boolean);
+  const prs = (v, n) => (Array.isArray(v) ? v : []).slice(0, n).map((p) => [str(p?.[0], 160), str(p?.[1], 600)]).filter((p) => p[0] || p[1]);
+  o.extra = JSON.stringify({ tagline: str(ex.tagline, 300), how: prs(ex.how, 8), uses: prs(ex.uses, 8), makes: lines(ex.makes, 16), kit: lines(ex.kit, 16), faq: prs(ex.faq, 10) });
   let slug = U.slugify(str(b.slug, 80) || o.title);
   const taken = (s) => db.prepare('SELECT id FROM items WHERE slug = ? AND id != ?').get(s, existing.id || 0);
   for (let i = 2; taken(slug); i++) slug = `${slug.replace(/-\d+$/, '')}-${i}`;

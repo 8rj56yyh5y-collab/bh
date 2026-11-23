@@ -13,7 +13,7 @@ const DETAIL_LABELS = {
   mode: 'Формат', qty: 'Кількість', color: 'Колір', size: 'Розмір', branding: 'Брендування', deadline: 'Термін',
   own_material: 'Своя сировина', material: 'Сировина', volume: 'Обсяг', output: 'Бажаний продукт', budget: 'Бюджет',
   format: 'Формат партнерства', vacancy: 'Вакансія', experience: 'Досвід', weight: 'Вага', pickup: 'Вивіз',
-  delivery: 'Доставка', install: 'Монтаж і навчання', service: 'Послуга', product: 'Виріб', org: 'Організація',
+  delivery: 'Доставка', install: 'Монтаж і навчання', service: 'Послуга', product: 'Виріб', org: 'Організація', solution: 'Рішення',
 };
 
 function formatRequest(r, publicUrl) {

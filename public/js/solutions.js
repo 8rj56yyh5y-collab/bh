@@ -1,0 +1,90 @@
+/*
+ * «Рішення під ключ» — наші ідеї готових виробництв, зібрані з обладнання каталогу.
+ * items — адреси (slug) позицій каталогу та кількість; сума рахується з актуальних цін на сайті.
+ * Тексти: [українська, русский, English].
+ */
+window.BH_SOLUTIONS = [
+  {
+    id: 'caps-workshop', icon: 'caps', color: '#FF5A4E', material: 'caps',
+    title: ['Еко-цех кришечок', 'Эко-цех крышечек', 'Bottle-cap eco-workshop'],
+    lead: ['Мінімальна лінія, щоб школа, громада чи малий бізнес перетворювали кришечки на брус, лавки й таблички.',
+      'Минимальная линия, чтобы школа, громада или малый бизнес превращали крышечки в брус, скамейки и таблички.',
+      'A compact line that lets a school, community or small business turn bottle caps into lumber, benches and signs.'],
+    steps: [['Кришечки', 'Крышечки', 'Caps'], ['Дробарка', 'Дробилка', 'Shredder'], ['Екструдер', 'Экструдер', 'Extruder'], ['Форми під ваш виріб', 'Формы под ваше изделие', 'Moulds for your product'], ['Лавки, брус, листи', 'Скамейки, брус, листы', 'Benches, lumber, sheets']],
+    items: [['drobarka-dlya-plastyku-1-5-kvt', 1], ['shnekovyi-ekstruder-dlya-plastyku', 1], ['obladnannya-pid-zamovlennya', 1]],
+    makes: ['lavka-z-pereroblenoho-plastyku', 'plastykovyi-brus-ta-doshka', 'lysty-i-paneli-z-plastyku'],
+    who: [['Школи й університети', 'Школы и университеты', 'Schools & universities'], ['Громади й ОСББ', 'Громады и ОСМД', 'Communities'], ['Еко-ініціативи', 'Эко-инициативы', 'Eco-initiatives']],
+    perks: [['Працює від 220 В', 'Работает от 220 В', 'Runs on 220 V'], ['Поміщається в майстерні', 'Помещается в мастерской', 'Fits a workshop'], ['Навчимо працювати', 'Научим работать', 'We train your team']],
+  },
+  {
+    id: 'filament', icon: 'cube', color: '#3FA9F5', material: 'pet',
+    title: ['Філамент із пляшок', 'Филамент из бутылок', 'Filament from bottles'],
+    lead: ['Перетворіть пляшки й брак 3D-друку на власний філамент. Ідеально для 3D-ферм, шкіл робототехніки й R&D.',
+      'Превратите бутылки и брак 3D-печати в собственный филамент. Идеально для 3D-ферм, школ робототехники и R&D.',
+      'Turn bottles and 3D-print waste into your own filament. Ideal for print farms, robotics schools and R&D.'],
+    steps: [['Пляшки PET', 'Бутылки PET', 'PET bottles'], ['Дробарка', 'Дробилка', 'Shredder'], ['Екструдер', 'Экструдер', 'Extruder'], ['Котушка філаменту', 'Катушка филамента', 'Filament spool']],
+    items: [['drobarka-dlya-plastyku-1-5-kvt', 1], ['shnekovyi-ekstruder-dlya-plastyku', 1]],
+    makes: ['3d-druk-pid-zamovlennya'],
+    who: [['3D-друкарні', '3D-печатные', '3D print farms'], ['Школи робототехніки', 'Школы робототехники', 'Robotics schools'], ['Лабораторії', 'Лаборатории', 'Labs']],
+    perks: [['Два PID-регулятори', 'Два PID-регулятора', 'Two PID controllers'], ['PET · ABS · PLA', 'PET · ABS · PLA', 'PET · ABS · PLA'], ['Фільєра під діаметр', 'Фильера под диаметр', 'Custom die size']],
+  },
+  {
+    id: 'foundry', icon: 'flame', color: '#FF8A3D', material: 'lead',
+    title: ['Ливарна майстерня', 'Литейная мастерская', 'Casting workshop'],
+    lead: ['Тигель і точні фрезеровані форми: старий свинець стає грузилами, що продаються. Комплект на одному верстаті.',
+      'Тигель и точные фрезерованные формы: старый свинец становится грузилами, которые продаются. Комплект на одном верстаке.',
+      'A crucible plus precise CNC-milled moulds: scrap lead becomes sinkers that sell. The whole kit fits on one bench.'],
+    steps: [['Свинець', 'Свинец', 'Lead'], ['Тигель', 'Тигель', 'Crucible'], ['Форми Д16Т', 'Формы Д16Т', 'D16T moulds'], ['Грузила', 'Грузила', 'Sinkers']],
+    items: [['elektrychnyi-tyhel-dlya-plavlennya', 1], ['forma-dlya-lyttya-hryppa-100-g', 1], ['forma-dlya-lyttya-kraplya-100-g', 1], ['forma-dlya-lyttya-kraplya-200-g', 1]],
+    makes: [],
+    who: [['Рибальські магазини', 'Рыболовные магазины', 'Tackle shops'], ['Майстри-одинаки', 'Мастера-одиночки', 'Solo makers'], ['Пункти прийому', 'Пункты приёма', 'Scrap yards']],
+    perks: [['Вага ±2%', 'Вес ±2%', 'Weight ±2%'], ['Форми під вашу вагу', 'Формы под ваш вес', 'Moulds to your weight'], ['Електронне керування', 'Электронное управление', 'Electronic control']],
+  },
+  {
+    id: 'farm', icon: 'leaf', color: '#2FD18B', material: 'farm',
+    title: ['Ферма зелені в контейнері', 'Ферма зелени в контейнере', 'Container greens farm'],
+    lead: ['Наша ідея: утеплений модуль + LED-фітолампи + стелажі з нашого цеху. Цілорічний салат і зелень будь-де, де є електрика.',
+      'Наша идея: утеплённый модуль + LED-фитолампы + стеллажи из нашего цеха. Круглогодичный салат и зелень везде, где есть электричество.',
+      'Our idea: an insulated module + LED grow lights + racks from our shop. Year-round greens anywhere with power.'],
+    steps: [['Модуль PIR 100', 'Модуль PIR 100', 'PIR-100 module'], ['Стелажі', 'Стеллажи', 'Racks'], ['LED-фітолампи', 'LED-фитолампы', 'LED grow lights'], ['Зелень цілий рік', 'Зелень круглый год', 'Greens all year']],
+    items: [['modulnyi-zbirno-rozbirnyi-kontejner-pir-100', 1], ['komplekt-led-fitolamp-1600-vt', 1], ['obladnannya-pid-zamovlennya', 1]],
+    makes: [],
+    who: [['Фермери', 'Фермеры', 'Farmers'], ['Ресторани', 'Рестораны', 'Restaurants'], ['Підприємці-початківці', 'Начинающие предприниматели', 'First-time founders']],
+    perks: [['До 12,8 м² під світлом', 'До 12,8 м² под светом', 'Up to 12.8 m² lit'], ['Приїжджає складеним', 'Приезжает сложенным', 'Ships flat-packed'], ['Тепло цілий рік', 'Тепло круглый год', 'Warm all year']],
+  },
+  {
+    id: 'pellets', icon: 'pellet', color: '#FFC531', material: 'wood',
+    title: ['Паливні пелети', 'Топливные пеллеты', 'Fuel pellets'],
+    lead: ['Повна лінія 1 т/год із двома італійськими пресами: тирса й обрізки перетворюються на фасоване паливо.',
+      'Полная линия 1 т/ч с двумя итальянскими прессами: опилки и обрезки превращаются в фасованное топливо.',
+      'A complete 1 t/h line with two Italian presses: sawdust and offcuts become bagged fuel.'],
+    steps: [['Тирса', 'Опилки', 'Sawdust'], ['Млини', 'Мельницы', 'Mills'], ['Преси BOLARETTO', 'Прессы BOLARETTO', 'BOLARETTO presses'], ['Фасування', 'Фасовка', 'Bagging']],
+    items: [['liniya-vyrobnytstva-pelet-1-t-god', 1]],
+    makes: [],
+    alt: 'derevoobrobne-pidpryiemstvo-karpaty',
+    who: [['Деревообробники', 'Деревообработчики', 'Sawmills'], ['Агрохолдинги', 'Агрохолдинги', 'Agri businesses'], ['Інвестори', 'Инвесторы', 'Investors']],
+    perks: [['1 т/год', '1 т/ч', '1 t/h'], ['В наявності', 'В наличии', 'In stock'], ['Допоможемо із запуском', 'Поможем с запуском', 'Start-up support']],
+  },
+  {
+    id: 'logistics', icon: 'truck', color: '#9B7BFF', material: 'scrap',
+    title: ['Логістика брухту й відходів', 'Логистика лома и отходов', 'Scrap & waste logistics'],
+    lead: ['Те, на чому працюємо самі: контейнер для мультиліфта на вивезення й теплий модуль-офіс для майданчика.',
+      'То, на чём работаем сами: контейнер для мультилифта на вывоз и тёплый модуль-офис для площадки.',
+      'What we run ourselves: a hook-lift container for collection and a warm modular office for the yard.'],
+    steps: [['Майданчик', 'Площадка', 'Yard'], ['Контейнер мультиліфт', 'Контейнер мультилифт', 'Hook-lift container'], ['Офіс-модуль', 'Офис-модуль', 'Office module'], ['Вивезення', 'Вывоз', 'Collection']],
+    items: [['kontejner-dlya-multylifta-scania', 1], ['modulnyi-zbirno-rozbirnyi-kontejner-pir-100', 1]],
+    makes: [],
+    who: [['Пункти прийому брухту', 'Пункты приёма лома', 'Scrap yards'], ['Будівельні компанії', 'Строительные компании', 'Builders'], ['Комунальні служби', 'Коммунальные службы', 'Municipal services']],
+    perks: [['Можна в оренду', 'Можно в аренду', 'Available to rent'], ['Під ваше шасі', 'Под ваше шасси', 'Fit for your chassis'], ['Перевірено на собі', 'Проверено на себе', 'Proven in-house']],
+  },
+];
+
+// Сировина для підбору лінії: який матеріал → яке рішення.
+window.BH_MATERIALS = [
+  { id: 'caps', icon: 'caps', sol: 'caps-workshop', t: ['Кришечки, HDPE / PP', 'Крышечки, HDPE / PP', 'Caps, HDPE / PP'] },
+  { id: 'pet', icon: 'glass', sol: 'filament', t: ['Пляшки PET, брак 3D-друку', 'Бутылки PET, брак 3D-печати', 'PET bottles, 3D-print waste'] },
+  { id: 'lead', icon: 'flame', sol: 'foundry', t: ['Свинець, м’які метали', 'Свинец, мягкие металлы', 'Lead, soft metals'] },
+  { id: 'wood', icon: 'pellet', sol: 'pellets', t: ['Тирса, деревні відходи', 'Опилки, древесные отходы', 'Sawdust, wood waste'] },
+  { id: 'scrap', icon: 'truck', sol: 'logistics', t: ['Металобрухт, будівельні відходи', 'Металлолом, строительные отходы', 'Scrap metal, construction waste'] },
+  { id: 'farm', icon: 'leaf', sol: 'farm', t: ['Хочу вирощувати зелень', 'Хочу выращивать зелень', 'I want to grow greens'] },
+];

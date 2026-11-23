@@ -144,6 +144,11 @@ function setSettings(obj) {
   }
 }
 
+// Міграції для баз попередніх версій.
+if (!db.prepare('PRAGMA table_info(items)').all().some((c) => c.name === 'extra')) {
+  db.exec("ALTER TABLE items ADD COLUMN extra TEXT NOT NULL DEFAULT '{}'");
+}
+
 const parseJSON = (s, def) => { try { return JSON.parse(s); } catch { return def; } };
 
 module.exports = { db, DATA_DIR, UPLOAD_DIR, FILES_DIR, getSettings, setSettings, DEFAULT_SETTINGS, parseJSON };

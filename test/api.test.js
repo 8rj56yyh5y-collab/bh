@@ -89,6 +89,14 @@ test('адмінка: додати, змінити, приховати та ви
   assert.equal((await req('/equipment/pres-dlia-kryshechok')).status, 200);
   await req(`/api/admin/items/${c.body.item.id}`, { method: 'PATCH', body: JSON.stringify({ published: false }) });
   assert.equal((await req('/equipment/pres-dlia-kryshechok')).status, 404);
+  // збереження без поля extra не стирає розповідь товару
+  const ex = (await req('/api/items/drobarka-dlya-plastyku-1-5-kvt')).body.item;
+  assert.ok(ex.extra.how.length >= 3);
+  await req(`/api/admin/items/${ex.id}`, { method: 'PUT', body: JSON.stringify({ ...ex, extra: undefined, price: 36000 }) });
+  const ex2 = (await req('/api/items/drobarka-dlya-plastyku-1-5-kvt')).body.item;
+  assert.equal(ex2.price, 36000);
+  assert.equal(ex2.extra.how.length, ex.extra.how.length);
+  assert.equal((await req('/solutions')).status, 200);
   assert.equal((await req(`/api/admin/items/${c.body.item.id}`, { method: 'DELETE' })).status, 200);
   assert.equal((await fetch(base + up.body.url)).status, 404);
 });

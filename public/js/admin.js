@@ -127,7 +127,7 @@ window.BH_ADMIN = (() => {
     }
     load();
   }
-  const DET = { mode: 'Формат', qty: 'Кількість', color: 'Колір', size: 'Розміри', branding: 'Лого/напис', deadline: 'Термін', own_material: 'Своя сировина', material: 'Сировина', volume: 'Обсяг', output: 'Бажаний продукт', budget: 'Бюджет', format: 'Формат партнерства', vacancy: 'Вакансія', experience: 'Досвід', weight: 'Кількість сировини', pickup: 'Потрібен вивіз', delivery: 'Доставка', install: 'Монтаж і навчання', service: 'Послуга', product: 'Виріб', org: 'Організація' };
+  const DET = { mode: 'Формат', qty: 'Кількість', color: 'Колір', size: 'Розміри', branding: 'Лого/напис', deadline: 'Термін', own_material: 'Своя сировина', material: 'Сировина', volume: 'Обсяг', output: 'Бажаний продукт', budget: 'Бюджет', format: 'Формат партнерства', vacancy: 'Вакансія', experience: 'Досвід', weight: 'Кількість сировини', pickup: 'Потрібен вивіз', delivery: 'Доставка', install: 'Монтаж і навчання', service: 'Послуга', product: 'Виріб', org: 'Організація', solution: 'Рішення під ключ' };
   function openRequest(x, reload) {
     const types = C.META.requestTypes;
     const tel = x.phone ? `tel:${x.phone}` : '';
@@ -238,6 +238,13 @@ window.BH_ADMIN = (() => {
         <div class="form__row">${sel('availability', 'Наявність', AVAIL, x.availability)}${f('lead_time', 'Термін виготовлення', x.lead_time, { ph: 'від 14 робочих днів' })}</div>
         <div style="display:flex;gap:18px;flex-wrap:wrap">${chk('rent', 'Можна в оренду', x.rent)}${chk('custom', 'Робимо під параметри замовника', x.custom)}${chk('featured', 'Хіт / на головній', x.featured)}${chk('published', 'Показувати на сайті', x.published)}</div>
       </div>
+      <div class="ed-sec"><h4>Сторінка товару: розповідь</h4>
+        ${f('ex_tagline', 'Головна думка (великий слоган під фото)', (x.extra || {}).tagline, { ph: 'Перший крок будь-якої переробки…' })}
+        <div class="field"><span>Як це працює — кроки</span><div class="rows" id="howRows"></div><button type="button" class="btn btn--xs" id="howAdd" style="justify-self:start">${C.icon('plus', 14)} Крок</button></div>
+        <div class="field"><span>Для кого — аудиторії</span><div class="rows" id="useRows"></div><button type="button" class="btn btn--xs" id="useAdd" style="justify-self:start">${C.icon('plus', 14)} Аудиторія</button></div>
+        <div class="form__row">${f('ex_makes', 'Що можна виготовляти (кожен пункт з нового рядка)', ((x.extra || {}).makes || []).join('\n'), { type: 'textarea' })}${f('ex_kit', 'Що входить (кожен пункт з нового рядка)', ((x.extra || {}).kit || []).join('\n'), { type: 'textarea' })}</div>
+        <div class="field"><span>Часті питання</span><div class="rows" id="faqRows"></div><button type="button" class="btn btn--xs" id="faqAdd" style="justify-self:start">${C.icon('plus', 14)} Питання</button></div>
+      </div>
       <div class="ed-sec"><h4>Ключові цифри на картці (до 4)</h4><div class="rows" id="hlRows"></div><button type="button" class="btn btn--xs" id="hlAdd" style="justify-self:start">${C.icon('plus', 14)} Додати</button></div>
       <div class="ed-sec"><h4>Характеристики</h4><div class="rows" id="spRows"></div><button type="button" class="btn btn--xs" id="spAdd" style="justify-self:start">${C.icon('plus', 14)} Додати рядок</button></div>
       <div class="ed-sec"><h4>Додатково</h4>
@@ -271,6 +278,11 @@ window.BH_ADMIN = (() => {
     const specs = (x.specs || []).map((p) => [...p]);
     const hls = (x.highlights || []).map((p) => [...p]);
     $('#spAdd', m.el).addEventListener('click', pairRows($('#spRows', m.el), specs, ['Параметр', 'Значення'], 60));
+    const ex0 = x.extra || {};
+    const how = (ex0.how || []).map((q) => [...q]), uses = (ex0.uses || []).map((q) => [...q]), faq = (ex0.faq || []).map((q) => [...q]);
+    $('#howAdd', m.el).addEventListener('click', pairRows($('#howRows', m.el), how, ['Крок (Подрібнення)', 'Що відбувається'], 8));
+    $('#useAdd', m.el).addEventListener('click', pairRows($('#useRows', m.el), uses, ['Кому (Школи)', 'Яку задачу вирішує'], 8));
+    $('#faqAdd', m.el).addEventListener('click', pairRows($('#faqRows', m.el), faq, ['Питання', 'Відповідь'], 10));
     $('#hlAdd', m.el).addEventListener('click', pairRows($('#hlRows', m.el), hls, ['Значення (40 кг/год)', 'Підпис (продуктивність)'], 4));
 
     // фото
@@ -300,6 +312,9 @@ window.BH_ADMIN = (() => {
       const fd = new FormData(form);
       const body = Object.fromEntries([...fd.entries()]);
       for (const k of ['rent', 'custom', 'featured', 'published']) body[k] = form[k].checked;
+      const lines = (v) => String(v || '').split('\n').map((q) => q.trim()).filter(Boolean);
+      body.extra = { tagline: body.ex_tagline, how: how.filter((q) => q[0] || q[1]), uses: uses.filter((q) => q[0] || q[1]), faq: faq.filter((q) => q[0] || q[1]), makes: lines(body.ex_makes), kit: lines(body.ex_kit) };
+      delete body.ex_tagline; delete body.ex_makes; delete body.ex_kit;
       body.images = imgs; body.specs = specs.filter((p) => p[0] || p[1]); body.highlights = hls.filter((p) => p[0] || p[1]);
       if (body.price_type === 'request') body.price = '';
       try {

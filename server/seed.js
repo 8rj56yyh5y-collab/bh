@@ -6,7 +6,7 @@ const { db, UPLOAD_DIR, parseJSON } = require('./db');
 
 const ITEM_FIELDS = ['slug', 'kind', 'category', 'title', 'title_ru', 'title_en', 'summary', 'summary_ru', 'summary_en',
   'description', 'description_ru', 'description_en', 'specs', 'highlights', 'price', 'price_type', 'price_note', 'unit',
-  'availability', 'lead_time', 'rent', 'custom', 'plastic_kg', 'images', 'featured', 'published', 'sort', 'source_url'];
+  'availability', 'lead_time', 'rent', 'custom', 'plastic_kg', 'images', 'featured', 'published', 'sort', 'source_url', 'extra'];
 
 function insertItem(it) {
   const row = {
@@ -14,6 +14,7 @@ function insertItem(it) {
     specs: [], highlights: [], price: null, price_type: 'fixed', price_note: '', unit: 'шт.', availability: 'order', lead_time: '',
     rent: 0, custom: 1, plastic_kg: null, images: [], featured: 0, published: 1, sort: 100, source_url: '', ...it,
   };
+  row.extra = JSON.stringify(it.extra || require('../seed/extra')[it.slug] || {});
   row.specs = JSON.stringify(row.specs);
   row.highlights = JSON.stringify(row.highlights);
   row.images = JSON.stringify(row.images);
@@ -29,6 +30,10 @@ function seedIfEmpty() {
     for (const it of items) insertItem(it);
     console.log(`Каталог: завантажено ${items.length} позицій (обладнання, вироби, послуги).`);
   }
+  // Розширені описи сторінок товарів: доповнюємо позиції, де їх ще немає (бази попередніх версій).
+  const extra = require('../seed/extra');
+  const upd = db.prepare("UPDATE items SET extra = ? WHERE slug = ? AND (extra = '{}' OR extra = '')");
+  for (const [slug, x] of Object.entries(extra)) upd.run(JSON.stringify(x), slug);
   if (!db.prepare('SELECT COUNT(*) n FROM vacancies').get().n && !db.prepare("SELECT 1 FROM settings WHERE key = 'vacancies_seeded'").get()) {
     const ins = db.prepare('INSERT INTO vacancies (title, kind, schedule, salary, summary, duties, requirements, offer, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
     for (const v of require('../seed/vacancies')) {

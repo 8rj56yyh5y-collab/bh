@@ -149,7 +149,7 @@
   };
 
   // ── оболонка: шапка, меню, підвал
-  const NAV = [['/equipment', 'nav.equipment'], ['/caps', 'nav.caps'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/about', 'nav.about'], ['/contacts', 'nav.contacts']];
+  const NAV = [['/equipment', 'nav.equipment'], ['/solutions', 'nav.solutions'], ['/caps', 'nav.caps'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/contacts', 'nav.contacts']];
   function renderShell() {
     document.documentElement.lang = lang === 'uk' ? 'uk' : lang;
     $('[data-s="brand"]').textContent = S().brand;
@@ -157,7 +157,7 @@
     $$('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
     $('#nav').innerHTML = NAV.map(([h, k]) => `<a href="${h}">${t(k)}</a>`).join('');
     const vac = META.vacancies;
-    $('#mnav').innerHTML = `<nav aria-label="${t('menu')}">${[['/', 'nav.home'], ...NAV, ['/request', 'nav.request']].map(([h, k]) => `<a class="mlink" href="${h}">${t(k)}${k === 'nav.careers' && vac ? `<small>${vac}</small>` : ''}${icon('chevR', 18)}</a>`).join('')}</nav>
+    $('#mnav').innerHTML = `<nav aria-label="${t('menu')}">${[['/', 'nav.home'], ...NAV, ['/about', 'nav.about'], ['/request', 'nav.request']].map(([h, k]) => `<a class="mlink" href="${h}">${t(k)}${k === 'nav.careers' && vac ? `<small>${vac}</small>` : ''}${icon('chevR', 18)}</a>`).join('')}</nav>
       <div class="mnav__foot">
         <div class="lang" role="group">${LANGS.map((l) => `<button type="button" data-lang="${l}" class="${l === lang ? 'on' : ''}">${l === 'uk' ? 'UA' : l.toUpperCase()}</button>`).join('')}</div>
         <a class="btn btn--acc btn--block" href="/contacts#form">${t('cta.order')}</a>
@@ -202,7 +202,7 @@
         </div>
         <div><h4>${t('ft.catalog')}</h4><ul>${cats.map((c) => `<li><a href="/equipment?cat=${c.slug}">${esc(c[lang] || c.uk)}</a></li>`).join('')}<li><a href="/caps">${t('nav.caps')}</a></li><li><a href="/services">${t('nav.services')}</a></li></ul></div>
         <div><h4>${t('ft.company')}</h4><ul>
-          <li><a href="/about">${t('nav.about')}</a></li><li><a href="/partners">${t('nav.partners')}</a></li><li><a href="/careers">${t('nav.careers')}</a></li><li><a href="/contacts">${t('nav.contacts')}</a></li>
+          <li><a href="/about">${t('nav.about')}</a></li><li><a href="/solutions">${t('sol.pageTitle')}</a></li><li><a href="/partners">${t('nav.partners')}</a></li><li><a href="/careers">${t('nav.careers')}</a></li><li><a href="/contacts">${t('nav.contacts')}</a></li>
           ${s.marketplace_url ? `<li><a href="${esc(s.marketplace_url)}" target="_blank" rel="noopener">${t('ft.marketplace')} ↗</a></li>` : ''}
         </ul></div>
         <div><h4>${t('ft.contacts')}</h4><ul>
@@ -227,7 +227,7 @@
   const ROUTES = [
     [/^\/$/, pageHome], [/^\/equipment\/?$/, () => pageCatalog('equipment')], [/^\/products\/?$/, () => pageCatalog('product')],
     [/^\/services\/?$/, pageServices], [/^\/(equipment|products|services)\/([a-z0-9-]+)\/?$/, (m) => pageItem(m[2])],
-    [/^\/caps\/?$/, pageCaps], [/^\/partners\/?$/, pagePartners], [/^\/careers\/?$/, pageCareers], [/^\/about\/?$/, pageAbout],
+    [/^\/caps\/?$/, pageCaps], [/^\/solutions\/?$/, pageSolutions], [/^\/partners\/?$/, pagePartners], [/^\/careers\/?$/, pageCareers], [/^\/about\/?$/, pageAbout],
     [/^\/contacts\/?$/, pageContacts], [/^\/request\/?$/, pageBasket], [/^\/admin\/?$/, pageAdmin],
   ];
   let navToken = 0;
@@ -450,6 +450,7 @@
     setTitle(`${S().brand} — ${t('dir1.t').toLowerCase()} · ${t('dir2.t').toLowerCase()}`, t('hero.lead'));
     const { items } = await cached('/api/items?featured=1');
     remember(items);
+    const bySlug = await allBySlug();
     const eq = items.filter((x) => x.kind === 'equipment').slice(0, 8);
     const capsItems = items.filter((x) => x.category === 'caps');
     const mq = t('marquee');
@@ -479,6 +480,8 @@
     </section>
     <div class="marquee" aria-hidden="true"><div class="marquee__in">${[...mq, ...mq].map((x) => `<span>${esc(x)}</span>`).join('')}</div></div>
 
+    <section class="story" id="story" aria-label="${esc(t('story.eyebrow'))}"></section>
+
     <section class="sec"><div class="wrap">
       ${head(`<span class="num">01</span>&nbsp;${t('dirs.eyebrow')}`, t('dirs.title'), t('dirs.lead'))}
       <div class="dirs">
@@ -490,24 +493,29 @@
     </div></section>
 
     <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">02</span>&nbsp;${t('feat.eyebrow')}`, t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
+      ${head(`<span class="num">02</span>&nbsp;${t('sol.eyebrow')}`, t('sol.title'), t('sol.lead'), `<a class="btn btn--sm" href="/solutions">${t('sol.all')} ${icon('arrow', 16)}</a>`)}
+      <div class="sols stagger">${SOLS.map((x) => solCard(x, bySlug)).join('')}</div>
+    </div></section>
+
+    <section class="sec sec--panel"><div class="wrap">
+      ${head(`<span class="num">03</span>&nbsp;${t('feat.eyebrow')}`, t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
       <div class="cards stagger">${eq.map(card).join('')}</div>
     </div></section>
 
     <section class="sec"><div class="wrap">${capsBand(capsItems)}</div></section>
 
     <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">03</span>&nbsp;${t('proc.eyebrow')}`, t('proc.title'), '')}
+      ${head(`<span class="num">04</span>&nbsp;${t('proc.eyebrow')}`, t('proc.title'), '')}
       ${stepsBlock('proc', ['clip', 'chart', 'blueprint', 'wrench', 'shield', 'truck'])}
     </div></section>
 
     <section class="sec"><div class="wrap split">
-      <div class="reveal"><div class="eyebrow"><span class="num">04</span>&nbsp;${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
+      <div class="reveal"><div class="eyebrow"><span class="num">05</span>&nbsp;${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
       <div class="feats reveal" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${[['factory', 1], ['cnc', 2], ['recycle', 3], ['wrench', 4]].map(([ic, i]) => `<div class="feat spot"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`why.${i}t`)}</h3><p>${t(`why.${i}p`)}</p></div>`).join('')}</div>
     </div></section>
 
     <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">05</span>&nbsp;${t('pa.eyebrow')}`, t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
+      ${head(`<span class="num">06</span>&nbsp;${t('pa.eyebrow')}`, t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
       <div class="feats">${[['book', 1], ['users', 2], ['handshake', 3]].map(([ic, i]) => `<a class="feat spot reveal" href="/partners#f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p></a>`).join('')}
         <a class="feat spot reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip chip--acc" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
       </div>
@@ -517,6 +525,115 @@
     ${ctaBlock()}`;
     bindCalc();
     bindTilt();
+    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon });
+  }
+
+  // ── рішення під ключ
+  const SOLS = window.BH_SOLUTIONS || [];
+  const TL = (arr) => (Array.isArray(arr) ? arr[LI()] || arr[0] : arr);
+  async function allBySlug() {
+    const { items } = await cached('/api/items');
+    remember(items);
+    return new Map(items.map((x) => [x.slug, x]));
+  }
+  function solTotal(sol, bySlug, mult = 1) {
+    let sum = 0, partial = false;
+    for (const [slug, q] of sol.items) {
+      const it = bySlug.get(slug);
+      const qty = slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q;
+      if (!it || it.price == null || it.price_type === 'request') { partial = true; continue; }
+      sum += it.price * qty;
+    }
+    return { sum, partial };
+  }
+  function solCard(sol, bySlug) {
+    const { sum, partial } = solTotal(sol, bySlug);
+    return `<a class="sol spot" href="/solutions#${sol.id}" style="--c:${sol.color}">
+      <span class="sol__icon">${icon(sol.icon, 26)}</span>
+      <h3>${esc(TL(sol.title))}</h3>
+      <p>${esc(TL(sol.lead))}</p>
+      <div class="chain">${sol.steps.map((x) => `<span>${esc(TL(x))}</span>`).join('<i>→</i>')}</div>
+      <div class="sol__foot"><div class="sol__sum">${sum ? `<small>${t('sol.sum')}</small><b>${N(sum)} ₴</b>${partial ? `<small>${t('sol.plus')}</small>` : ''}` : `<b style="font-size:16px">${t('sol.sumReq')}</b>`}</div><span class="dir__go" style="position:static">${icon('arrowUR', 18)}</span></div>
+    </a>`;
+  }
+  function flowline(sol, bySlug, mult = 1) {
+    const { sum, partial } = solTotal(sol, bySlug, mult);
+    const rows = sol.items.map(([slug, q]) => {
+      const it = bySlug.get(slug); if (!it) return '';
+      const qty = slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q;
+      return `<a class="flowline__item" href="${itemUrl(it)}"><div class="flowline__img">${imgOrArt(it)}</div><div><h4>${esc(L(it, 'title'))}</h4><small>${esc(catName(it.category))}</small></div><div class="flowline__q"><b>${esc(priceText(it))}</b>× ${qty}</div></a>`;
+    }).join('');
+    return `<div class="flowline" style="--c:${sol.color}">${rows}
+      <div class="flowline__total"><div><small style="color:var(--muted)">${t('sol.sum')}</small><div class="price">${sum ? `${N(sum)} ₴` : t('sol.sumReq')}</div>${partial ? `<small style="color:var(--muted)">${t('sol.plus')}</small>` : ''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn--acc btn--sm" data-solask="${sol.id}" data-mult="${mult}">${t('sol.ask')} ${icon('arrow', 16)}</button><button type="button" class="btn btn--sm" data-soladd="${sol.id}" data-mult="${mult}">${icon('clip', 16)} ${t('sol.addAll')}</button></div></div>
+    </div>`;
+  }
+  function bindSolButtons(root, bySlug) {
+    const itemsOf = (id, mult) => {
+      const sol = SOLS.find((x) => x.id === id);
+      return sol.items.map(([slug, q]) => { const it = bySlug.get(slug); return it && { it, qty: slug === 'drobarka-dlya-plastyku-1-5-kvt' ? q * mult : q }; }).filter(Boolean);
+    };
+    root.addEventListener('click', (e) => {
+      const ask = e.target.closest('[data-solask]'); const add = e.target.closest('[data-soladd]');
+      if (ask) {
+        const sol = SOLS.find((x) => x.id === ask.dataset.solask);
+        openRequestModal({ type: 'equipment', solution: TL(sol.title), itemsList: itemsOf(sol.id, Number(ask.dataset.mult) || 1) });
+      }
+      if (add) {
+        for (const { it, qty } of itemsOf(add.dataset.soladd, Number(add.dataset.mult) || 1)) { if (!basket.has(it.id)) basket.add(it, qty, 'buy'); }
+        toast(`${icon('check', 18)} ${t('sol.added')} · <a href="/request">${t('bk.open')}</a>`);
+      }
+    });
+  }
+
+  async function pageSolutions() {
+    setTitle(`${t('sol.pageTitle')} — ${S().brand}`, t('sol.pageLead'));
+    const bySlug = await allBySlug();
+    const mats = window.BH_MATERIALS || [];
+    app.innerHTML = `
+      <section class="page-head"><div class="grid-bg"></div><div class="wrap" style="position:relative">
+        <div class="crumbs"><a href="/">${t('nav.home')}</a><span>${t('nav.solutions')}</span></div>
+        <h1>${t('sol.pageTitle')}</h1><p class="lead">${t('sol.pageLead')}</p>
+        <div class="chain" style="margin-top:26px;gap:8px">${SOLS.map((x) => `<a class="chip" href="#${x.id}" style="--c:${x.color}"><span class="dot" style="color:${x.color}"></span>${esc(TL(x.title))}</a>`).join('')}</div>
+      </div></section>
+      <section class="sec--tight" style="padding-top:clamp(32px,5vw,56px)"><div class="wrap">
+        <div class="cfg reveal" id="cfg">
+          <div><div class="eyebrow">${t('cfg.eyebrow')}</div><h2 style="font-size:clamp(28px,3.4vw,44px)">${t('cfg.title')}</h2></div>
+          <div><p class="cfg__h" style="margin-bottom:12px">${t('cfg.s1')}</p><div class="cfg__mats">${mats.map((m, i) => `<button type="button" class="cfg__mat ${i ? '' : 'on'}" data-mat="${m.id}"><span>${icon(m.icon, 22)}</span><span>${esc(TL(m.t))}</span></button>`).join('')}</div></div>
+          <div><p class="cfg__h" style="margin-bottom:12px">${t('cfg.s2')}</p><div class="seg" role="group">${[1, 2, 3].map((v) => `<button type="button" data-scale="${v}" class="${v === 1 ? 'on' : ''}">${t(`cfg.v${v}`)}</button>`).join('')}</div></div>
+          <div id="cfgOut"></div>
+        </div>
+      </div></section>
+      <div class="wrap">${SOLS.map((x, i) => `<section class="solx" id="${x.id}" style="--c:${x.color}">
+        <div class="reveal">
+          <div class="solx__n">0${i + 1} / ${t('sol.eyebrow')}</div>
+          <h2>${esc(TL(x.title))}</h2>
+          <p class="solx__lead">${esc(TL(x.lead))}</p>
+          <div class="chain" style="margin-top:20px;--c:${x.color}">${x.steps.map((st) => `<span>${esc(TL(st))}</span>`).join('<i>→</i>')}</div>
+          <div class="solx__perks">${x.perks.map((pk) => `<div>${icon('check', 18, 2.2)}${esc(TL(pk))}</div>`).join('')}</div>
+          <p class="cfg__h" style="margin-bottom:10px">${t('sol.who')}</p>
+          <div class="solx__who">${x.who.map((w) => `<span class="chip">${esc(TL(w))}</span>`).join('')}</div>
+          ${x.makes.length ? `<p class="cfg__h" style="margin:22px 0 10px">${t('sol.makes')}</p><div class="solx__makes">${x.makes.map((sl) => bySlug.get(sl)).filter(Boolean).map((m) => `<a class="chip chip--acc" href="${itemUrl(m)}">${esc(L(m, 'title'))} ↗</a>`).join('')}</div>` : ''}
+          ${x.alt && bySlug.get(x.alt) ? `<p class="cfg__h" style="margin:22px 0 10px">${t('sol.alt')}</p><a class="link" href="${itemUrl(bySlug.get(x.alt))}">${esc(L(bySlug.get(x.alt), 'title'))} ↗</a>` : ''}
+        </div>
+        <div class="reveal"><p class="cfg__h" style="margin-bottom:12px">${t('sol.includes')}</p>${flowline(x, bySlug)}</div>
+      </section>`).join('')}</div>
+      ${ctaBlock()}`;
+    let mat = mats[0]?.id, scale = 1;
+    const drawCfg = () => {
+      const m = mats.find((x) => x.id === mat); const sol = SOLS.find((x) => x.id === m.sol);
+      const plastic = ['caps', 'pet'].includes(mat);
+      $('#cfgOut').innerHTML = `<div class="cfg__out" style="--c:${sol.color}">
+        <p class="cfg__h" style="margin-bottom:12px">${t('cfg.result')}: <span style="color:${sol.color}">${esc(TL(sol.title))}</span></p>
+        <div class="chain" style="margin-bottom:16px">${sol.steps.map((st) => `<span>${esc(TL(st))}</span>`).join('<i>→</i>')}</div>
+        ${flowline(sol, bySlug, plastic ? scale : 1)}
+        <p class="calc__hint" style="margin-top:12px">${scale > 1 ? `${t('cfg.scaleNote')} ` : ''}${t('cfg.note')} <a class="link" href="#${sol.id}">${t('sol.more')} ↓</a></p>
+      </div>`;
+    };
+    $$('[data-mat]').forEach((b) => b.addEventListener('click', () => { mat = b.dataset.mat; $$('[data-mat]').forEach((x) => x.classList.toggle('on', x === b)); drawCfg(); }));
+    $$('[data-scale]').forEach((b) => b.addEventListener('click', () => { scale = Number(b.dataset.scale); $$('[data-scale]').forEach((x) => x.classList.toggle('on', x === b)); drawCfg(); }));
+    drawCfg();
+    bindSolButtons(app, bySlug);
   }
   function words(parts) {
     let i = 0;
@@ -668,8 +785,13 @@
     if (it.rent) fmts.push(t('item.fmtRent'));
     if (it.custom) fmts.push(t('item.fmtCustom'));
     const desc = L(it, 'description');
+    const ex = it.extra || {};
+    const bySlug = await allBySlug();
+    const sols = SOLS.filter((x) => x.items.some(([sl]) => sl === it.slug) || x.makes.includes(it.slug) || x.alt === it.slug);
+    const secs = [['overview', 'it.overview'], ex.how?.length && ['how', 'it.how'], ex.uses?.length && ['uses', 'it.uses'], ex.makes?.length && ['makes', 'it.makes'],
+      sols.length && ['solutions', 'nav.solutions'], ['specs', 'it.specs'], ex.faq?.length && ['faq', 'it.faq']].filter(Boolean);
     app.innerHTML = `
-      <div class="wrap">
+      <section class="ihero"><div class="wrap">
         <div class="crumbs" style="margin:28px 0 0"><a href="/">${t('nav.home')}</a><a href="/${kindPath(it.kind)}"><span>${t(kindKey)}</span></a><a href="/${kindPath(it.kind)}?cat=${it.category}"><span>${esc(catName(it.category))}</span></a></div>
         <div class="item">
             <div class="gallery item__gallery">
@@ -678,12 +800,7 @@
               </div>
               ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((u, i) => `<button type="button" class="${i ? '' : 'on'}" data-thumb="${i}" aria-label="${i + 1}"><img src="${esc(u)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
             </div>
-            <div class="item__info">
-              <div class="tabs" role="tablist"><button type="button" class="on" data-tab="desc">${t('item.tabDesc')}</button><button type="button" data-tab="specs">${t('item.tabSpecs')}</button></div>
-              <div data-pane="desc"><div class="rich">${richText(desc)}</div></div>
-              <div data-pane="specs" class="hidden">${(it.specs || []).length ? `<table class="specs"><tbody>${it.specs.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="rich">${t('item.noSpecs')}</p>`}</div>
-              ${it.kind === 'equipment' ? `<div class="included">${[['chart', 1], ['truck', 2], ['book', 3], ['wrench', 4]].map(([ic, i]) => `<div>${icon(ic, 22)}<p><b>${t(`inc.${i}t`)}</b><span>${t(`inc.${i}p`)}</span></p></div>`).join('')}</div>` : ''}
-            </div>
+            <div class="item__info hidden"></div>
           <aside class="buy">
             <div style="display:flex;gap:6px;flex-wrap:wrap">${badges(it)}</div>
             <h1>${esc(title)}</h1>
@@ -713,6 +830,48 @@
           </aside>
         </div>
       </div>
+      </section>
+
+      <nav class="subnav" aria-label="${esc(title)}"><div class="wrap subnav__in">${secs.map(([id, k]) => `<a href="#${id}" data-sn="${id}">${t(k)}</a>`).join('')}<button type="button" class="btn btn--acc btn--xs" id="orderBtn3">${t('item.order')}</button></div></nav>
+
+      <section class="isec" id="overview"><div class="wrap">
+        ${ex.tagline ? `<p class="itag reveal">${esc(ex.tagline)}</p>` : ''}
+        ${it.kind !== 'service' ? `<div class="included" style="margin-top:32px">${[['chart', 1], ['truck', 2], ['book', 3], ['wrench', 4]].map(([ic, i]) => `<div class="spot">${icon(ic, 22)}<p><b>${t(`inc.${i}t`)}</b><span>${t(`inc.${i}p`)}</span></p></div>`).join('')}</div>` : ''}
+      </div></section>
+
+      ${ex.how?.length ? `<section class="isec" id="how"><div class="wrap">
+        <div class="eyebrow">${t('it.how')}</div><h2>${esc(title)}: ${t('it.how').toLowerCase()}</h2>
+        <div class="how">${ex.how.map(([h, p], i) => `<div class="how__step" style="--i:${i}"><div class="how__dot">0${i + 1}</div><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join('')}</div>
+      </div></section>` : ''}
+
+      ${ex.uses?.length ? `<section class="isec" id="uses" style="background:var(--bg-2)"><div class="wrap">
+        <div class="eyebrow">${t('it.uses')}</div><h2>${t('it.uses')}</h2>
+        <div class="uses stagger">${ex.uses.map(([h, p], i) => `<div class="use spot"><b>0${i + 1}</b><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join('')}</div>
+      </div></section>` : ''}
+
+      ${ex.makes?.length ? `<section class="isec" id="makes"><div class="wrap">
+        <div class="eyebrow">${t('it.makes')}</div><h2>${t('it.makes')}</h2>
+        <div class="makes stagger">${ex.makes.map((m, i) => `<span class="make" style="--c:${CAP_COLORS[i % CAP_COLORS.length]}"><i></i>${esc(m)}</span>`).join('')}</div>
+      </div></section>` : ''}
+
+      ${sols.length ? `<section class="isec" id="solutions" style="background:var(--bg-2)"><div class="wrap">
+        <div class="eyebrow">${t('sol.eyebrow')}</div><h2>${t('it.inSol')}</h2><p class="lead" style="margin:-12px 0 28px">${t('it.inSolLead')}</p>
+        <div class="isol stagger">${sols.map((s) => solCard(s, bySlug)).join('')}</div>
+      </div></section>` : ''}
+
+      <section class="isec" id="specs"><div class="wrap ispecs">
+        <div>
+          <div class="eyebrow">${t('it.specs')}</div><h2>${t('it.specs')}</h2>
+          ${(it.specs || []).length ? `<table class="specs"><tbody>${it.specs.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="rich">${t('item.noSpecs')}</p>`}
+          ${ex.kit?.length ? `<h3 style="margin:36px 0 14px;font-size:20px">${t('it.kit')}</h3><ul class="kit">${ex.kit.map((k) => `<li>${icon('check', 18, 2.2)}${esc(k)}</li>`).join('')}</ul>` : ''}
+        </div>
+        <div><div class="eyebrow">${t('it.desc')}</div><div class="rich" style="margin-top:8px">${richText(desc)}</div></div>
+      </div></section>
+
+      ${ex.faq?.length ? `<section class="isec" id="faq"><div class="wrap split">
+        <div><div class="eyebrow">FAQ</div><h2>${t('it.faq')}</h2><p class="lead" style="margin-bottom:22px">${t('co.lead')}</p><button type="button" class="btn btn--acc" id="askBtn">${t('it.askEngineer')} ${icon('arrow', 18)}</button></div>
+        <div class="faq">${ex.faq.map(([q, a], i) => `<details ${i ? '' : 'open'}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+      </div></section>` : ''}
       ${related.length ? `<section class="sec sec--panel"><div class="wrap">${head(t('item.related'), catName(it.category), '')}<div class="cards stagger">${related.map(card).join('')}</div></div></section>` : ''}
       ${ctaBlock()}
       <div class="sticky-buy">${priceHtml(it)}<button type="button" class="btn btn--acc btn--sm" id="orderBtn2">${t('item.order')}</button></div>`;
@@ -741,6 +900,21 @@
     const open = (mode) => openRequestModal({ type, item: it, mode });
     $('#orderBtn').addEventListener('click', () => open(''));
     $('#orderBtn2').addEventListener('click', () => open(''));
+    $('#orderBtn3').addEventListener('click', () => open(''));
+    $('#askBtn')?.addEventListener('click', () => openRequestModal({ type: it.kind === 'equipment' ? 'equipment' : type, item: it, mode: 'consult' }));
+    bindSolButtons(app, bySlug);
+    const how = $('.how');
+    if (how && 'IntersectionObserver' in window) { const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { how.classList.add('in'); io.disconnect(); } }, { threshold: .4 }); io.observe(how); }
+    // підсвічування пункту підменю за прокруткою
+    if ('IntersectionObserver' in window) {
+      const links = new Map($$('[data-sn]').map((a2) => [a2.dataset.sn, a2]));
+      const io2 = new IntersectionObserver((ens) => ens.forEach((en) => {
+        if (!en.isIntersecting) return;
+        links.forEach((l, id) => l.classList.toggle('on', id === en.target.id));
+        links.get(en.target.id)?.scrollIntoView({ block: 'nearest', inline: 'center' });
+      }), { rootMargin: '-45% 0px -50% 0px' });
+      $$('.isec').forEach((sec) => io2.observe(sec));
+    }
     $('#rentBtn')?.addEventListener('click', () => open('rent'));
     $('#shareBtn').addEventListener('click', async () => {
       const url = location.href.split('#')[0];
@@ -1010,7 +1184,7 @@
     const mode = ctx.mode || 'buy';
     switch (type) {
       case 'equipment':
-        if (ctx.basket) return `${checkbox('d_delivery', t('f.delivery'))}${checkbox('d_install', t('f.install'))}`;
+        if (ctx.basket || ctx.itemsList) return `${checkbox('d_delivery', t('f.delivery'))}${checkbox('d_install', t('f.install'))}`;
         return `<div class="field"><span>${t('f.mode')}</span>${radios('d_mode', [['buy', t('f.modeBuy')], ...(ctx.item?.rent || !ctx.item ? [['rent', t('f.modeRent')]] : []), ['custom', t('f.modeCustom')], ['consult', t('f.modeConsult')]], mode)}</div>
           <div class="form__row">${fld('d_qty', t('f.qty'), { type: 'number', val: '1', attrs: 'min="1"' })}${fld('city', t('f.city'))}</div>
           ${checkbox('d_install', t('f.install'))}`;
@@ -1055,6 +1229,7 @@
       const msgLabel = ['custom', 'service'].includes(type) ? t('f.messageTask') : t('f.message');
       box.innerHTML = `<form class="form" novalidate>
         ${ctx.topicSelect ? `<div class="field"><span>${t('f.topic')}</span><select name="__topic">${TOPICS.map((k) => `<option value="${k}" ${k === type ? 'selected' : ''}>${t(`topic.${k}`)}</option>`).join('')}</select></div>` : ''}
+        ${ctx.itemsList ? `<div class="files">${ctx.itemsList.map(({ it, qty }) => `<div><span>${esc(L(it, 'title'))}</span><span class="mono">× ${qty}</span></div>`).join('')}</div>` : ''}
         ${ctx.item ? `<div class="bline" style="grid-template-columns:64px 1fr;padding:10px"><div class="bline__img" style="width:64px;height:48px">${imgOrArt(ctx.item)}</div><div><h4 style="font-size:15px;margin:0">${esc(L(ctx.item, 'title'))}</h4><div style="font-size:13px;color:var(--muted)">${esc(priceText(ctx.item))}</div></div></div>` : ''}
         <div class="type-fields" style="display:grid;gap:14px">${typeFields(type, ctx)}</div>
         <div class="form__row">${fld('name', t('f.name'), { req: true, val: saved.name || '', attrs: 'autocomplete="name"' })}${fld('phone', t('f.phone'), { type: 'tel', req: true, ph: '+380 __ ___ __ __', val: saved.phone || '', attrs: 'autocomplete="tel" inputmode="tel"' })}</div>
@@ -1124,6 +1299,8 @@
       let items = [];
       if (ctx.item) items = [{ id: ctx.item.id, qty: Number(details.qty) || 1, mode: details.mode || '' }];
       if (ctx.basket) items = basket.items.map((x) => ({ id: x.id, qty: x.qty || 1, mode: modeLabel[x.mode] || '' }));
+      if (ctx.itemsList) items = ctx.itemsList.map(({ it, qty }) => ({ id: it.id, qty, mode: '' }));
+      if (ctx.solution) details.solution = ctx.solution;
       const btn = $('button[type=submit]', form);
       btn.disabled = true; const txt = btn.innerHTML; btn.textContent = t('f.sending');
       try {
@@ -1151,7 +1328,7 @@
     const titles = { equipment: t('item.order'), product: t('capsF.title'), service: t('sv.formTitle'), job: t('job.formTitle') };
     const el = document.createElement('div');
     el.className = 'modal'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
-    el.innerHTML = `<div class="modal__box"><div class="modal__head"><div><h3>${esc(ctx.vacancy ? ctx.vacancy : titles[ctx.type] || t('cta.order'))}</h3><p>${t('co.lead')}</p></div><button type="button" class="iconbtn" data-close aria-label="close">${icon('x', 20)}</button></div><div class="modal__body"></div></div>`;
+    el.innerHTML = `<div class="modal__box"><div class="modal__head"><div><h3>${esc(ctx.solution || ctx.vacancy || titles[ctx.type] || t('cta.order'))}</h3><p>${t('co.lead')}</p></div><button type="button" class="iconbtn" data-close aria-label="close">${icon('x', 20)}</button></div><div class="modal__body"></div></div>`;
     const close = () => { el.remove(); document.removeEventListener('keydown', key); document.body.style.overflow = ''; };
     const key = (e) => { if (e.key === 'Escape') close(); };
     el.addEventListener('mousedown', (e) => { if (e.target === el) close(); });
