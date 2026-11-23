@@ -64,7 +64,7 @@
   const icon = (n, size = 20, sw = 1.8) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || I.gear}</svg>`;
 
   // ── ілюстрації для позицій без фото: «терраццо» з кришечок + силует виробу
-  const CAP_COLORS = ['#FF5A4E', '#FFC531', '#3FA9F5', '#2FD18B', '#EDEFEA', '#9B7BFF', '#FF8A3D'];
+  const CAP_COLORS = ['#8C9A93', '#B9C4BE', '#6F7C76', '#A8C7C0', '#C6F432', '#5D6963', '#D5DBD6'];
   function rng(seed) { let h = 2166136261; for (const c of String(seed)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909), (h >>>= 0) / 4294967296)); }
   const SIL = {
     bench: '<g fill="none" stroke="#0A0E0D" stroke-width="10" stroke-linecap="round"><path d="M70 215v60M330 215v60M90 160v55M310 160v55"/></g><rect x="50" y="195" width="300" height="26" rx="8"/><rect x="50" y="150" width="300" height="22" rx="8"/><rect x="50" y="112" width="300" height="22" rx="8"/>',
@@ -149,7 +149,7 @@
   };
 
   // ── оболонка: шапка, меню, підвал
-  const NAV = [['/equipment', 'nav.equipment'], ['/solutions', 'nav.solutions'], ['/caps', 'nav.caps'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/contacts', 'nav.contacts']];
+  const NAV = [['/equipment', 'nav.equipment'], ['/solutions', 'nav.solutions'], ['/products', 'nav.products'], ['/services', 'nav.services'], ['/partners', 'nav.partners'], ['/careers', 'nav.careers'], ['/contacts', 'nav.contacts']];
   function renderShell() {
     document.documentElement.lang = lang === 'uk' ? 'uk' : lang;
     $('[data-s="brand"]').textContent = S().brand;
@@ -343,7 +343,6 @@
   const head = (eyebrow, title, lead, extra = '') => `<div class="sec__head reveal"><div><div class="eyebrow">${eyebrow}</div><h2>${title}</h2></div>${lead ? `<p>${lead}</p>` : ''}${extra}</div>`;
   function badges(it) {
     const b = [];
-    if (it.featured && it.kind === 'equipment') b.push(`<span class="chip chip--acc">${t('badge.top')}</span>`);
     if (it.availability === 'stock') b.push(`<span class="chip"><span class="dot" style="color:var(--ok)"></span>${t('badge.stock')}</span>`);
     else b.push(`<span class="chip">${t(`badge.${it.availability}`)}</span>`);
     if (it.rent) b.push(`<span class="chip">${t('badge.rent')}</span>`);
@@ -446,86 +445,101 @@
   }
 
   // ── ГОЛОВНА
+  // Вторсировина → продукт: що з якої сировини виходить і на якому обладнанні.
+  const MATERIALS = [
+    { id: 'metal', icon: 'anvil', products: ['manhal-hryl-ruchnoi-roboty', 'pich-burzhuika-z-dymokhodom', 'kontejner-dlya-multylifta-scania'], extra: [['sinkers', '/solutions#foundry']], eq: ['elektrychnyi-tyhel-dlya-plavlennya', 'forma-dlya-lyttya-kraplya-100-g', 'plazmova-rizka-metalu-chpu'] },
+    { id: 'plastic', icon: 'recycle', products: ['plastykovyi-brus-ta-doshka', 'lavka-z-pereroblenoho-plastyku', 'urna-ta-smittievyi-bak', 'lysty-i-paneli-z-plastyku'], eq: ['drobarka-dlya-plastyku-1-5-kvt', 'shnekovyi-ekstruder-dlya-plastyku'] },
+    { id: 'glass', icon: 'glass', products: ['sklyanky-z-plyashok', 'vazy-ta-posud-zi-skla'], eq: ['lazerne-hraviyuvannya-chpu'] },
+    { id: 'wood', icon: 'pellet', products: [], extra: [['pellets', '/equipment/liniya-vyrobnytstva-pelet-1-t-god']], eq: ['liniya-vyrobnytstva-pelet-1-t-god', 'derevoobrobne-pidpryiemstvo-karpaty'] },
+  ];
+  const EXTRA_LABEL = { 'sinkers': ['Рибальські грузила', 'Рыболовные грузила', 'Fishing sinkers'], pellets: ['Паливні пелети', 'Топливные пеллеты', 'Fuel pellets'] };
+  function materialsBlock(bySlug) {
+    const link = (it) => `<li><a href="${itemUrl(it)}"><span>${esc(L(it, 'title'))}</span>${it.price != null && it.price_type !== 'request' ? `<em>${esc(priceText(it))}</em>` : '<em>→</em>'}</a></li>`;
+    return `<div class="mats stagger">${MATERIALS.map((m) => `<div class="mat spot">
+      <div class="mat__top"><span class="mat__icon">${icon(m.icon, 24)}</span><div><h3>${t(`mat.${m.id}`)}</h3><small>${t(`mat.${m.id}S`)}</small></div></div>
+      <div class="mat__arrow" aria-hidden="true">${icon('arrow', 18)}</div>
+      <p class="mat__h">${t('mat.makes')}</p>
+      <ul class="mat__list">${m.products.map((sl) => bySlug.get(sl)).filter(Boolean).map(link).join('')}${(m.extra || []).map(([k, href]) => `<li><a href="${href}"><span>${esc(TL(EXTRA_LABEL[k]))}</span><em>→</em></a></li>`).join('')}</ul>
+      <p class="mat__h">${t('mat.uses')}</p>
+      <div class="mat__eq">${m.eq.map((sl) => bySlug.get(sl)).filter(Boolean).map((it) => `<a class="chip" href="${itemUrl(it)}">${esc(L(it, 'title'))}</a>`).join('')}</div>
+    </div>`).join('')}</div>`;
+  }
+
   async function pageHome() {
-    setTitle(`${S().brand} — ${t('dir1.t').toLowerCase()} · ${t('dir2.t').toLowerCase()}`, t('hero.lead'));
+    setTitle(`${S().brand} — ${t('hero.h1a').toLowerCase()} ${t('hero.h1b')} ${t('hero.h1c')}`, t('hero.lead'));
     const { items } = await cached('/api/items?featured=1');
     remember(items);
     const bySlug = await allBySlug();
     const eq = items.filter((x) => x.kind === 'equipment').slice(0, 8);
-    const capsItems = items.filter((x) => x.category === 'caps');
     const mq = t('marquee');
     app.innerHTML = `
-    <section class="hero"><div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div><div class="grid-bg"></div>
+    <section class="hero"><div class="aurora" aria-hidden="true"><i></i><i></i></div><div class="grid-bg"></div>
       <div class="wrap">
         <div class="hero__in">
           <div>
             <div class="eyebrow"><span class="pulse"></span>&nbsp;${esc(t('hero.eyebrow', { city: S().city }))}</div>
-            <h1 aria-label="${esc(`${t('hero.h1a')} ${t('hero.h1b')} ${t('hero.h1c')}`)}">${words([[t('hero.h1a'), ''], [t('hero.h1b'), 'caps-word'], [t('hero.h1c'), 'acc']])}</h1>
+            <h1 aria-label="${esc(`${t('hero.h1a')} ${t('hero.h1b')} ${t('hero.h1c')}`)}">${words([[`${t('hero.h1a')} ${t('hero.h1b')}`, ''], [t('hero.h1c'), 'acc']])}</h1>
             <p class="lead">${t('hero.lead')}</p>
-            <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn" href="/caps">${icon('caps', 18)} ${t('hero.cta2')}</a></div>
+            <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn" href="/solutions">${t('hero.cta2')}</a></div>
           </div>
           <div class="flow-wrap"><div class="flow" id="flow">${flowSvg()}
             <span class="flow__badge"><span class="pulse"></span>${esc(t('flow.live'))}</span></div>
-            <div class="float-chip float-chip--a"><span class="ic">${icon('caps', 18)}</span><div><b class="mono">≈ 12 000</b><small>${esc(t('hero.f4'))}</small></div></div>
-            <div class="float-chip float-chip--b"><span class="ic">${icon('shredder', 18)}</span><div><b class="mono">40 ${lang === 'en' ? 'kg/h' : 'кг/год'}</b><small>${esc(t('flow.shred'))} 1,5 kW</small></div></div>
           </div>
         </div>
         <div class="hero__facts">
           <div><b class="mono" data-count="${META.counts.equipment || 0}">${META.counts.equipment || 0}</b><span>${t('hero.f1')}</span></div>
           <div><b class="mono" data-count="4">4</b><span>${t('hero.f2')}</span></div>
           <div><b>${t('hero.f3v')}</b><span>${t('hero.f3')}</span></div>
-          <div><b class="mono" data-count="12000" data-pre="≈">≈12 000</b><span>${t('hero.f4')}</span></div>
+          <div><b class="mono" data-count="4">4</b><span>${t('hero.f4')}</span></div>
         </div>
       </div>
     </section>
     <div class="marquee" aria-hidden="true"><div class="marquee__in">${[...mq, ...mq].map((x) => `<span>${esc(x)}</span>`).join('')}</div></div>
 
-    <section class="story" id="story" aria-label="${esc(t('story.eyebrow'))}"></section>
-
     <section class="sec"><div class="wrap">
-      ${head(`<span class="num">01</span>&nbsp;${t('dirs.eyebrow')}`, t('dirs.title'), t('dirs.lead'))}
+      ${head(t('dirs.eyebrow'), t('dirs.title'), t('dirs.lead'))}
       <div class="dirs">
         ${dirTile(1, '/equipment', 'shredder', ['plastic', 'foundry', 'biomass'])}
-        ${dirTile(2, '/caps', 'caps', null, 'dir--caps')}
+        ${dirTile(2, '/products', 'recycle', ['caps', 'glass', 'metal'])}
         ${dirTile(3, '/services', 'cnc', null)}
         ${dirTile(4, '/contacts?topic=custom#form', 'blueprint', ['containers', 'agro', 'heating'])}
       </div>
     </div></section>
 
-    <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">02</span>&nbsp;${t('sol.eyebrow')}`, t('sol.title'), t('sol.lead'), `<a class="btn btn--sm" href="/solutions">${t('sol.all')} ${icon('arrow', 16)}</a>`)}
-      <div class="sols stagger">${SOLS.map((x) => solCard(x, bySlug)).join('')}</div>
+    <section class="story sec--panel" id="story" aria-label="${esc(t('story.eyebrow'))}"></section>
+
+    <section class="sec"><div class="wrap">
+      ${head(t('mat.eyebrow'), t('mat.title'), t('mat.lead'))}
+      ${materialsBlock(bySlug)}
     </div></section>
 
     <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">03</span>&nbsp;${t('feat.eyebrow')}`, t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
+      ${head(t('feat.eyebrow'), t('feat.title'), t('feat.lead'), `<a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a>`)}
       <div class="cards stagger">${eq.map(card).join('')}</div>
     </div></section>
 
-    <section class="sec"><div class="wrap">${capsBand(capsItems)}</div></section>
-
-    <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">04</span>&nbsp;${t('proc.eyebrow')}`, t('proc.title'), '')}
-      ${stepsBlock('proc', ['clip', 'chart', 'blueprint', 'wrench', 'shield', 'truck'])}
+    <section class="sec"><div class="wrap">
+      ${head(t('sol.eyebrow'), t('sol.title'), t('sol.lead'), `<a class="btn btn--sm" href="/solutions">${t('sol.all')} ${icon('arrow', 16)}</a>`)}
+      <div class="sols stagger">${SOLS.map((x) => solCard(x, bySlug)).join('')}</div>
     </div></section>
 
-    <section class="sec"><div class="wrap split">
-      <div class="reveal"><div class="eyebrow"><span class="num">05</span>&nbsp;${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
+    <section class="sec sec--panel"><div class="wrap split">
+      <div class="reveal"><div class="eyebrow">${t('why.eyebrow')}</div><p class="big-quote">${t('why.quote')}</p></div>
       <div class="feats reveal" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${[['factory', 1], ['cnc', 2], ['recycle', 3], ['wrench', 4]].map(([ic, i]) => `<div class="feat spot"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`why.${i}t`)}</h3><p>${t(`why.${i}p`)}</p></div>`).join('')}</div>
     </div></section>
 
-    <section class="sec sec--panel"><div class="wrap">
-      ${head(`<span class="num">06</span>&nbsp;${t('pa.eyebrow')}`, t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
+    <section class="sec"><div class="wrap">
+      ${head(t('pa.eyebrow'), t('pa.title'), t('pa.lead'), `<a class="btn btn--sm" href="/partners">${t('pa.join')} ${icon('arrow', 16)}</a>`)}
       <div class="feats">${[['book', 1], ['users', 2], ['handshake', 3]].map(([ic, i]) => `<a class="feat spot reveal" href="/partners#f${i}"><div class="feat__icon">${icon(ic, 24)}</div><h3>${t(`pa.${i}t`)}</h3><p>${t(`pa.${i}p`)}</p></a>`).join('')}
-        <a class="feat spot reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip chip--acc" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
+        <a class="feat spot reveal" href="/careers"><div class="feat__icon">${icon('wrench', 24)}</div><h3>${t('pa.6t')}</h3><p>${t('pa.6p')}</p>${META.vacancies ? `<span class="chip" style="align-self:flex-start">${t('nav.careers')}: ${META.vacancies}</span>` : ''}</a>
       </div>
     </div></section>
 
     ${faqBlock()}
     ${ctaBlock()}`;
-    bindCalc();
     bindTilt();
-    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon });
+    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon, stat5: `${(META.counts.product || 0)}+` });
+    observeReveal();
   }
 
   // ── рішення під ключ
@@ -656,9 +670,9 @@
   }
   function dirTile(i, href, ic, cats, cls = '') {
     const tags = cats ? cats.map((c) => catOf(c)).filter((c) => c && c.count).map((c) => `<span class="chip">${esc(c[lang] || c.uk)}</span>`).join('') : '';
-    const artSvg = i === 2 ? art({ slug: 'lavka-home', kind: 'product' }, { dense: true, terrazzo: true, nobg: true }).replace('class="art"', '') : `<svg viewBox="0 0 24 24" fill="none" stroke="var(--acc-text)" stroke-width=".55" stroke-linecap="round" stroke-linejoin="round" opacity=".55">${I[ic]}</svg>`;
+    const artSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--acc-text)" stroke-width=".55" stroke-linecap="round" stroke-linejoin="round" opacity=".55">${I[ic]}</svg>`;
     return `<a class="dir spot reveal ${cls}" href="${href}">
-      <div class="dir__art" ${i === 2 ? 'style="opacity:.28"' : ''}>${artSvg}</div>
+      <div class="dir__art">${artSvg}</div>
       <span class="dir__n">0${i} /</span><span class="dir__go">${icon('arrowUR', 20)}</span>
       <h3>${t(`dir${i}.t`)}</h3><p>${t(`dir${i}.p`)}</p>${tags ? `<div class="dir__tags">${tags}</div>` : ''}</a>`;
   }
@@ -1084,7 +1098,7 @@
       </div></section>
       <section class="sec"><div class="wrap">
         ${head(t('dirs.eyebrow'), t('dirs.title'), '')}
-        <div class="dirs">${dirTile(1, '/equipment', 'shredder', null)}${dirTile(2, '/caps', 'caps', null, 'dir--caps')}${dirTile(3, '/services', 'cnc', null)}${dirTile(4, '/contacts?topic=custom#form', 'blueprint', null)}</div>
+        <div class="dirs">${dirTile(1, '/equipment', 'shredder', null)}${dirTile(2, '/products', 'recycle', null)}${dirTile(3, '/services', 'cnc', null)}${dirTile(4, '/contacts?topic=custom#form', 'blueprint', null)}</div>
       </div></section>
       <section class="sec sec--panel"><div class="wrap">
         ${head(t('ab.values'), t('ab.values'), '')}

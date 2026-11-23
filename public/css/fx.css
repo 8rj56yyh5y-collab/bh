@@ -188,3 +188,24 @@ body::after {
   .caps__art > div[style] { display: none !important; }
   .dir:nth-child(n) .dir__art svg { height: 60%; top: 8%; right: 16px; }
 }
+
+/* ═══ Спокійніше: одна акцентна палітра, менше декору ═══ */
+body::after { display: none; }
+.progress { background: var(--acc); height: 2px; opacity: .9; }
+.aurora { opacity: .32; filter: blur(90px); }
+.aurora i:nth-child(1) { background: radial-gradient(circle, rgba(198, 244, 50, .45), transparent 65%); }
+.aurora i:nth-child(2) { background: radial-gradient(circle, rgba(120, 170, 160, .35), transparent 65%); }
+:root[data-theme="light"] .aurora { opacity: .25; }
+.marquee span::after, .marquee span:nth-child(n)::after { background: var(--line-2); }
+.marquee span:nth-child(4n)::after { background: var(--acc); }
+.spot::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(198, 244, 50, .35), transparent 60%); }
+.spot::before { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(198, 244, 50, .05), transparent 40%); }
+.hero h1 .acc { color: var(--acc-text); }
+.hero__facts { background: var(--line); }
+.cta::before { opacity: .5; }
+.feat:hover .feat__icon { transform: none; }
+.card__badges .chip { font-size: 12px; }
+.sol::before { opacity: .1; }
+.sol:hover::before { opacity: .18; }
+.sol__icon { color: var(--acc-text); background: var(--bg-2); border-color: var(--line); }
+.chain span:last-child { color: var(--text); border-color: var(--line-2); }
