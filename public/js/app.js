@@ -191,7 +191,7 @@
     $('#ftr').innerHTML = `<div class="wrap">
       <div class="ftr__top">
         <div>
-          <a class="logo" href="/"><img class="logo__mark" src="/img/logo.svg" alt="" width="40" height="40"><span class="logo__txt"><b>${esc(s.brand)}</b><small>${esc($('[data-s="brand_sub"]').textContent)}</small></span></a>
+          <a class="logo" href="/"><img class="logo__mark" src="/img/logo-dark.svg" alt="" width="40" height="40"><span class="logo__txt"><b>${esc(s.brand)}</b><small>${esc($('[data-s="brand_sub"]').textContent)}</small></span></a>
           <p class="ftr__about">${t('ft.about')}</p>
           <div class="socials">
             ${telHref() ? `<a class="iconbtn" href="${telHref()}" aria-label="${t('co.phone')}">${icon('phone', 18)}</a>` : ''}
@@ -521,7 +521,7 @@
         <div class="drow" id="d4"><a class="drow__img drow__img--c" href="/contacts?topic=custom#form">${pic(get('kontejner-dlya-multylifta-scania'), 0)}<i>04</i></a><div><span class="eyebrow">${t('d.4k')}</span><h3>${t('d.4t')}</h3><p class="l">${t('d.4p')}</p>
           <ul class="bul">${[1, 2, 3].map((i) => `<li>${t(`d.4l${i}`)}</li>`).join('')}</ul>
           <div class="acts"><a class="btn btn--dark" href="/contacts?topic=custom#form">${t('d.4b')} ${icon('arrow', 18)}</a></div></div></div>
-        <div class="drow" id="d5"><a class="drow__img drow__mark" href="/partners"><div><img src="/img/logo.svg" alt=""><p>${t('d.5mark')}</p></div><i>05</i></a><div><span class="eyebrow">${t('d.5k')}</span><h3>${t('d.5t')}</h3><p class="l">${t('d.5p')}</p>
+        <div class="drow" id="d5"><a class="drow__img drow__mark" href="/partners"><div><img src="/img/logo-dark.svg" alt=""><p>${t('d.5mark')}</p></div><i>05</i></a><div><span class="eyebrow">${t('d.5k')}</span><h3>${t('d.5t')}</h3><p class="l">${t('d.5p')}</p>
           <ul class="bul">${[1, 2, 3].map((i) => `<li>${t(`d.5l${i}`)}</li>`).join('')}</ul>
           <div class="acts"><a class="btn btn--dark" href="/partners">${t('nav.partners')} ${icon('arrow', 18)}</a><a class="btn" href="/careers">${t('nav.careers')}${META.vacancies ? ` · ${META.vacancies}` : ''}</a></div></div></div>
       </div>
