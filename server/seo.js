@@ -59,10 +59,10 @@ function itemForPath(pathname) {
 function renderPage(req, pathname, base) {
   const p = pathname.replace(/\/+$/, '') || '/';
   const s = getSettings();
-  let title, desc, image = `${base}/img/og.png`, ssr = '', ld = [];
+  let title, desc, image = `${base}/img/bh-og.png`, ssr = '', ld = [];
   const org = {
     '@context': 'https://schema.org', '@type': 'Organization', name: s.brand, description: s.brand_sub, url: base,
-    logo: `${base}/img/logo.svg`, address: { '@type': 'PostalAddress', addressLocality: s.city, streetAddress: s.address || undefined, addressCountry: 'UA' },
+    logo: `${base}/img/bh-logo.svg`, address: { '@type': 'PostalAddress', addressLocality: s.city, streetAddress: s.address || undefined, addressCountry: 'UA' },
     telephone: s.phone || undefined, email: s.email || undefined,
   };
 

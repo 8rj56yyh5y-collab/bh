@@ -536,7 +536,7 @@ const server = http.createServer(async (req, res) => {
     if (/\.[a-z0-9]+$/i.test(pathname)) {
       const file = path.normalize(path.join(PUBLIC_DIR, pathname));
       if (!file.startsWith(PUBLIC_DIR + path.sep)) return notFound(req, res);
-      const cache = /\/(css|js)\//.test(pathname) && url.searchParams.has('v') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
+      const cache = /\/(css|js)\//.test(pathname) && url.searchParams.has('v') ? 'public, max-age=31536000, immutable' : 'no-cache';
       return serveFile(req, res, file, cache);
     }
     // Сторінки сайту: HTML з заголовками й описом для Google та соцмереж.
