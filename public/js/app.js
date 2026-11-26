@@ -177,7 +177,7 @@
     b.innerHTML = icon(light ? 'moon' : 'sun', 19);
     b.setAttribute('aria-label', t(light ? 'theme.dark' : 'theme.light'));
     b.title = b.getAttribute('aria-label');
-    $('meta[name=theme-color]').content = light ? '#F3F5F1' : '#0A0E0D';
+    $('meta[name=theme-color]').content = '#111111';
   }
   function renderBasketBtn() {
     const n = basket.items.length;
@@ -443,46 +443,102 @@
   }
 
   // ── ГОЛОВНА
+  // Анімована лінія: кришечки → дробарка → флекс → екструдер → брус → лавка
+  const LINE_CAPS = ['#FF5A4E', '#FFC531', '#3FA9F5', '#2FD18B', '#F2F2EF', '#FF6A13', '#9B7BFF'];
+  function bhLine() {
+    const C = LINE_CAPS;
+    let fall = '', pile = '', flakes = '', terr = '', bench = '';
+    for (let i = 0; i < 16; i++) { const x = 96 + (i % 8) * 17; fall += `<g class="a-fall" style="animation-delay:${(i * 0.27).toFixed(2)}s"><circle cx="${x}" cy="20" r="9" fill="${C[i % 7]}"/><circle cx="${x}" cy="20" r="5" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="2"/></g>`; }
+    for (let i = 0; i < 34; i++) { const x = 92 + ((i * 37) % 140), y = 150 + ((i * 13) % 26) - Math.abs(x - 162) / 9; pile += `<circle cx="${x}" cy="${y.toFixed(0)}" r="9" fill="${C[i % 7]}"/>`; }
+    for (let i = 0; i < 14; i++) flakes += `<rect class="a-flake" width="9" height="5" rx="1.5" fill="${C[i % 7]}" style="animation-delay:${(i * 0.28).toFixed(2)}s"/>`;
+    for (let i = 0; i < 70; i++) terr += `<circle cx="${(i * 41) % 236 + 4}" cy="${((i * 17) % 20) + 4}" r="${2 + (i % 3)}" fill="${C[i % 7]}"/>`;
+    for (let i = 0; i < 60; i++) bench += `<circle cx="${(i * 53) % 292 + 4}" cy="${[11, 41, 68][i % 3] + ((i * 7) % 7) - 3}" r="${2 + (i % 3)}" fill="${C[i % 7]}"/>`;
+    const L = [1, 2, 3, 4, 5].map((i) => esc(t(`h.s${i}`)).toUpperCase());
+    return `<svg class="bh-line" viewBox="0 0 1200 420" role="img" aria-label="${L.join(' → ')}">
+      <defs><linearGradient id="bhHeatG" x1="0" x2="1"><stop offset="0" stop-color="#FFB36B"/><stop offset="1" stop-color="#FF6A13"/></linearGradient>
+      <clipPath id="bhHop"><path d="M70 120h184l-46 92h-92z"/></clipPath><clipPath id="bhBeamC"><rect width="240" height="28" rx="4"/></clipPath>
+      <pattern id="bhGrid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0v30" fill="none" stroke="rgba(255,255,255,.05)"/></pattern></defs>
+      <rect width="1200" height="420" fill="url(#bhGrid)"/><path d="M0 372H1200" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      ${fall}<g clip-path="url(#bhHop)">${pile}</g><path d="M70 120h184l-46 92h-92z" fill="none" stroke="#FF6A13" stroke-width="3"/>
+      <rect x="104" y="212" width="116" height="104" rx="8" fill="#232323" stroke="#3A3A3A" stroke-width="2"/>
+      <g fill="none" stroke="#FF6A13" stroke-width="4"><g class="a-spin" style="transform-origin:142px 264px"><circle cx="142" cy="264" r="22"/><path d="M142 242v44M120 264h44"/></g><g class="a-spin rev" style="transform-origin:184px 264px"><circle cx="184" cy="264" r="22"/><path d="M184 242v44M162 264h44"/></g></g>
+      <path d="M120 316v56M204 316v56" stroke="#3A3A3A" stroke-width="8"/>
+      <path d="M220 300 C300 300 330 210 410 210" fill="none" stroke="#3A3A3A" stroke-width="10" stroke-linecap="round"/>
+      <path class="a-belt" d="M220 300 C300 300 330 210 410 210" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 8"/>${flakes}
+      <path d="M400 168h56l-12 40h-32z" fill="#232323" stroke="#FF6A13" stroke-width="3"/>
+      <rect x="350" y="208" width="70" height="52" rx="8" fill="#2A2A2A" stroke="#3A3A3A" stroke-width="2"/>
+      <rect x="420" y="214" width="330" height="40" rx="8" fill="#1E1E1E" stroke="#3A3A3A" stroke-width="2"/>
+      <rect class="a-heat" x="468" y="218" width="78" height="32" rx="5" fill="url(#bhHeatG)"/><rect class="a-heat" x="556" y="218" width="78" height="32" rx="5" fill="url(#bhHeatG)" style="animation-delay:.6s"/><rect class="a-heat" x="644" y="218" width="78" height="32" rx="5" fill="url(#bhHeatG)" style="animation-delay:1.2s"/>
+      <path class="a-screw" d="M428 234h316" stroke="#F2F2EF" stroke-width="3" stroke-dasharray="10 7" opacity=".6"/>
+      <rect x="750" y="222" width="16" height="24" rx="3" fill="#FF6A13"/><path d="M440 254v118M730 254v118" stroke="#3A3A3A" stroke-width="8"/>
+      <g transform="translate(766 220)"><g class="a-beam"><g clip-path="url(#bhBeamC)"><rect width="240" height="28" fill="#2F2F2F"/>${terr}</g></g></g>
+      <g transform="translate(860 268)"><path d="M24 74v30M276 74v30M40 22v18M260 22v18" stroke="#6A6A66" stroke-width="10" stroke-linecap="round"/>
+        <g class="a-bench"><rect width="300" height="22" rx="6" fill="#2F2F2F"/><rect y="30" width="300" height="22" rx="6" fill="#2F2F2F"/><rect y="58" width="300" height="20" rx="6" fill="#2F2F2F"/>${bench}</g></g>
+      <g font-family="Oswald, sans-serif" font-size="15" font-weight="700" letter-spacing="1.5" fill="#8A8A85">
+        <text x="268" y="150">01 · ${L[0]}</text><text x="104" y="400">02 · ${L[1]}</text><text x="478" y="200">03 · ${L[2]}</text><text x="766" y="206">04 · ${L[3]}</text><text x="860" y="400">05 · ${L[4]}</text></g>
+    </svg>`;
+  }
+
   async function pageHome() {
-    setTitle(`${S().brand} — ${t('hero.h1a').toLowerCase()} ${t('hero.h1b')} ${t('hero.h1c')}`, t('hero.lead'));
-    const { items } = await cached('/api/items?kind=equipment');
-    remember(items);
-    const own = items.filter((x) => (x.origin || 'own') === 'own').slice(0, 6);
-    const dirs = [[1, '/equipment'], [2, '/products'], [3, '/services'], [4, '/contacts?topic=custom#form']];
+    setTitle(`${S().brand} — ${t('h.h1a')} ${t('h.h1b')}`, t('h.lead'));
+    const bySlug = await allBySlug();
+    const get = (sl) => bySlug.get(sl);
+    const img = (it, i = 0) => (it?.images || [])[i] || (it?.images || [])[0] || '';
+    const own = [...bySlug.values()].filter((x) => x.kind === 'equipment' && (x.origin || 'own') === 'own').sort((x, y) => (y.featured - x.featured) || (x.sort - y.sort)).slice(0, 6);
+    const shred = get('drobarka-dlya-plastyku-1-5-kvt');
+    const mini = (slugs) => `<div class="mini">${slugs.map(get).filter(Boolean).map((it) => `<a href="${itemUrl(it)}">${img(it) ? `<img src="${esc(img(it))}" alt="" loading="lazy">` : art(it)}<b>${esc(L(it, 'title'))}</b><span>${esc(priceText(it))}</span></a>`).join('')}</div>`;
+    const pic = (it, i, cls = '') => (img(it, i) ? `<img src="${esc(img(it, i))}" alt="${esc(L(it, 'title'))}" loading="lazy">` : art(it, { dense: true }));
+    const svcs = [...bySlug.values()].filter((x) => x.kind === 'service' && x.category === 'cnc');
     app.innerHTML = `
-    <section class="hero"><div class="grid-bg"></div>
-      <div class="wrap">
-        <div class="hero__in">
-          <div>
-            <div class="eyebrow">${esc(t('hero.eyebrow', { city: S().city }))}</div>
-            <h1>${t('hero.h1a')} ${t('hero.h1b')} <span class="acc">${t('hero.h1c')}</span></h1>
-            <p class="lead">${t('hero.lead')}</p>
-            <div class="hero__cta"><a class="btn btn--acc" href="/equipment">${t('hero.cta1')} ${icon('arrow', 18)}</a><a class="btn btn--ghost" href="/contacts?topic=custom#form">${t('hero.cta2')}</a></div>
-          </div>
-          <div class="flow">${flowSvg()}</div>
-        </div>
+    <section class="bh-hero"><div class="wrap">
+      <span class="eyebrow">${esc(t('hero.eyebrow', { city: S().city }))}</span>
+      <h1>${t('h.h1a')} <em>${t('h.h1b')}</em></h1>
+      <div class="bh-hero__row"><p>${t('h.lead')}</p>
+        <div class="acts"><a class="btn btn--acc" href="/equipment">${t('h.cta1')} ${icon('arrow', 18)}</a><a class="btn btn--ghost" href="#idea">${t('h.cta2')}</a></div></div>
+    </div>
+    <div class="bh-stage"><div class="wrap"><div class="bh-line-wrap">${bhLine()}</div><p class="bh-swipe">${t('h.swipe')}</p>
+      <div class="bh-steps">${[1, 2, 3, 4, 5].map((i) => `<div><b>${t(`h.s${i}`)}</b>${t(`h.s${i}p`)}</div>`).join('')}</div>
+    </div></div></section>
+
+    <section class="bh-sec" id="idea"><div class="wrap">
+      <div class="bh-head reveal"><div><span class="eyebrow">${t('i.eyebrow')}</span><h2>${t('i.title')}</h2></div><p>${t('i.lead')}</p></div>
+      <div class="idea reveal">${[1, 2, 3].map((i) => `<div class="idea__i"><b>0${i}</b><h3>${t(`i.${i}t`)}</h3><p>${t(`i.${i}p`)}</p></div>`).join('')}</div>
+      <div class="idea__note reveal">${[1, 2, 3].map((i) => `<div><h4>${t(`i.n${i}t`)}</h4><p>${t(`i.n${i}p`)}</p></div>`).join('')}</div>
+    </div></section>
+
+    <section class="bh-sec bh-sec--g"><div class="wrap">
+      <div class="bh-head reveal"><div><span class="eyebrow">${t('d.eyebrow')}</span><h2>${t('d.title')}</h2></div></div>
+      <nav class="dirnav" aria-label="${esc(t('d.title'))}">${[1, 2, 3, 4, 5].map((i) => `<a href="#d${i}"><span>0${i}</span>${t(`d.n${i}`)}</a>`).join('')}</nav>
+      <div class="drows">
+        <div class="drow" id="d1"><a class="drow__img" href="/equipment">${pic(shred, 1)}<i>01</i></a><div><span class="eyebrow">${t('d.1k')}</span><h3>${t('d.1t')}</h3><p class="l">${t('d.1p')}</p>
+          ${mini(['drobarka-dlya-plastyku-1-5-kvt', 'shnekovyi-ekstruder-dlya-plastyku', 'elektrychnyi-tyhel-dlya-plavlennya'])}<div class="acts"><a class="btn btn--dark" href="/equipment">${t('d.1b')} ${icon('arrow', 18)}</a></div></div></div>
+        <div class="drow" id="d2"><a class="drow__img drow__img--c" href="/products">${pic(get('manhal-hryl-ruchnoi-roboty'), 0)}<i>02</i></a><div><span class="eyebrow">${t('d.2k')}</span><h3>${t('d.2t')}</h3><p class="l">${t('d.2p')}</p>
+          <div class="mats3">${[1, 2, 3].map((i) => `<div><b>${t(`d.2m${i}`)}</b><span>${t(`d.2m${i}p`)}</span></div>`).join('')}</div>
+          <div class="acts"><a class="btn btn--dark" href="/products">${t('d.2b')} ${icon('arrow', 18)}</a><a class="btn" href="/caps">${t('d.2b2')}</a></div></div></div>
+        <div class="drow" id="d3"><a class="drow__img drow__img--c" href="/services">${pic(get('plazmova-rizka-metalu-chpu'), 0)}<i>03</i></a><div><span class="eyebrow">${t('d.3k')}</span><h3>${t('d.3t')}</h3><p class="l">${t('d.3p')}</p>
+          <ul class="bul">${svcs.map((x) => `<li><span><a href="${itemUrl(x)}"><b>${esc(L(x, 'title'))}.</b></a> ${esc(L(x, 'summary'))}</span></li>`).join('')}</ul>
+          <div class="acts"><a class="btn btn--dark" href="/services#form">${t('d.3b')} ${icon('arrow', 18)}</a></div></div></div>
+        <div class="drow" id="d4"><a class="drow__img drow__img--c" href="/contacts?topic=custom#form">${pic(get('kontejner-dlya-multylifta-scania'), 0)}<i>04</i></a><div><span class="eyebrow">${t('d.4k')}</span><h3>${t('d.4t')}</h3><p class="l">${t('d.4p')}</p>
+          <ul class="bul">${[1, 2, 3].map((i) => `<li>${t(`d.4l${i}`)}</li>`).join('')}</ul>
+          <div class="acts"><a class="btn btn--dark" href="/contacts?topic=custom#form">${t('d.4b')} ${icon('arrow', 18)}</a></div></div></div>
+        <div class="drow" id="d5"><a class="drow__img drow__mark" href="/partners"><div><img src="/img/logo.svg" alt=""><p>${t('d.5mark')}</p></div><i>05</i></a><div><span class="eyebrow">${t('d.5k')}</span><h3>${t('d.5t')}</h3><p class="l">${t('d.5p')}</p>
+          <ul class="bul">${[1, 2, 3].map((i) => `<li>${t(`d.5l${i}`)}</li>`).join('')}</ul>
+          <div class="acts"><a class="btn btn--dark" href="/partners">${t('nav.partners')} ${icon('arrow', 18)}</a><a class="btn" href="/careers">${t('nav.careers')}${META.vacancies ? ` · ${META.vacancies}` : ''}</a></div></div></div>
       </div>
-    </section>
-
-    <section class="sec"><div class="wrap">
-      <div class="sec__head reveal"><div><div class="eyebrow">${t('dirs.eyebrow')}</div><h2>${t('dirs.title')}</h2></div><p>${t('dirs.lead')}</p></div>
-      <div class="svc-list">${dirs.map(([i, href]) => `<a class="svc reveal" href="${href}"><span class="svc__n mono">0${i}</span><div><h3>${t(`dir${i}.t`)}</h3><p>${t(`dir${i}.p`)}</p></div><span class="svc__go">${icon('arrow', 20)}</span></a>`).join('')}</div>
     </div></section>
 
-    <section class="story sec--panel" id="story" aria-label="${esc(t('story.eyebrow'))}"></section>
-
-    <section class="sec"><div class="wrap">
-      <div class="sec__head reveal"><div><div class="eyebrow">${t('feat.eyebrow')}</div><h2>${t('feat.title')}</h2></div><a class="btn btn--sm" href="/equipment">${t('feat.all')} ${icon('arrow', 16)}</a></div>
-      <div class="cards">${own.map(card).join('')}</div>
+    <section class="bh-sec"><div class="wrap">
+      <div class="bh-head reveal"><div><span class="eyebrow">${t('c.eyebrow')}</span><h2>${t('c.title')}</h2></div><a class="btn btn--dark" href="/equipment">${t('feat.all')} ${icon('arrow', 18)}</a></div>
+      <div class="cards">${remember(own).map(card).join('')}</div>
     </div></section>
 
-    <section class="sec sec--panel"><div class="wrap duo">
-      <a class="duo__item reveal" href="/partners"><div class="eyebrow">${t('pa.eyebrow')}</div><h3>${t('pa.title')}</h3><p>${t('pa.lead')}</p><span class="link">${t('pa.join')} →</span></a>
-      <a class="duo__item reveal" href="/careers"><div class="eyebrow">${t('job.eyebrow')}</div><h3>${t('job.title')}</h3><p>${t('job.lead')}</p><span class="link">${t('nav.careers')}${META.vacancies ? ` · ${META.vacancies}` : ''} →</span></a>
+    <section class="bh-sec bh-sec--k"><div class="wrap">
+      <div class="bh-head reveal"><div><span class="eyebrow">${t('proc.eyebrow')}</span><h2>${t('p.title')}</h2></div></div>
+      <div class="bh-steps4">${[1, 2, 4, 6].map((n, i) => `<div><b>0${i + 1}</b><h3>${t(`proc.${n}t`)}</h3><p>${t(`proc.${n}p`)}</p></div>`).join('')}</div>
     </div></section>
 
-    ${ctaBlock()}`;
-    if (window.BH_STORY) window.BH_STORY.mount($('#story'), { t, esc, icon });
+    <section class="bh-cta" id="form"><div class="wrap"><div><h2>${t('f.title')}</h2><p>${t('f.lead')}</p></div><div class="form-card" id="homeForm"></div></div></section>`;
+    mountForm($('#homeForm'), { type: 'equipment', topicSelect: true });
     observeReveal();
   }
 
